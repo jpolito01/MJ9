@@ -1,0 +1,373 @@
+var NEWS_ID=0, NEWS_SOURCE=0, CELEBRITY_ID=0, USER_ID=0;
+
+function readMore(info,image)
+{
+	$("#read_more_post").text(info);
+	if(image!=null && image!="")
+	{
+    $("#read_more_post_img").attr("src",image);
+	}
+}
+
+
+function showProfile(celebrity_id)
+{
+	document.forms[0].action="show-profile?celebrity_id="+celebrity_id;
+	document.forms[0].method="POST";
+	document.forms[0].submit();
+
+}
+
+function validateUserProfile()
+{
+	var first_name=$("#first_name").val();
+	var last_name=$("#last_name").val();
+	var contact_no=$("#contact_no").val();
+	var email_id=$("#email_id").val();
+	if(first_name==null || first_name=="")
+		{
+		$(".errorMsg").text("Please enter First name");
+		$("#errorModal").modal('show');
+		return false;
+		}
+	if(last_name==null || last_name=="")
+	{
+	$(".errorMsg").text("Please enter last name");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	if(contact_no==null || contact_no=="")
+	{
+	$(".errorMsg").text("Please enter contact no");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	
+	if(email_id==null || email_id=="")
+	{
+	$(".errorMsg").text("Please enter email id");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	
+	if(isNaN(contact_no))
+	{
+	$(".errorMsg").text("Please enter valid contact number");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	
+	return true;
+}
+function validatePassword()
+{
+	var old_password=$("#old_password").val();
+	var new_password=$("#new_password").val();
+	var confirm_password=$("#confirm_password").val();
+	if(old_password==null || old_password=="")
+	{
+	$(".errorMsg").text("Please enter old password");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	if(new_password==null || new_password=="")
+	{
+	$(".errorMsg").text("Please enter new password");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	if(confirm_password==null || confirm_password=="")
+	{
+	$(".errorMsg").text("Please enter confirm password");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	if (new_password.length < 8 || new_password.length > 45) {
+
+		$(".errorMsg").text(
+				"Password characters should be between 8 and 45 respectively");
+		$("#errorModal").modal('show');
+		return false;
+	}
+	if (confirm_password.length < 8 || confirm_password.length > 45) {
+
+		$(".errorMsg").text(
+				"Password characters should be between 8 and 45 respectively");
+		$("#errorModal").modal('show');
+		return false;
+	}
+
+	if (new_password != confirm_password) {
+
+		$(".errorMsg").text("Confirm passwords do not match");
+		$("#errorModal").modal('show');
+		return false;
+	}
+	
+	return true;
+}
+function activeSideNav(index)
+{
+	if(index==1)
+		{
+		document.getElementById("edit_profile").action="settings?activeTab="+index;
+		document.getElementById("edit_profile").method="post";
+		document.getElementById("edit_profile").submit();
+		}
+	if(index==2)
+	{
+	document.getElementById("changePassword").action="change-password?activeTab="+index;
+	document.getElementById("changePassword").method="post";
+	document.getElementById("changePassword").submit();
+	}
+	if(index==3)
+	{
+	document.getElementById("user_follows").action="followers?activeTab="+index;
+	document.getElementById("user_follows").method="post";
+	document.getElementById("user_follows").submit();
+	}
+}
+function unfollowCelebrity(follow_id)
+{
+	document.getElementById("user_follows").action="followers?follow_id="+follow_id;
+	document.getElementById("user_follows").method="post";
+	document.getElementById("user_follows").submit();
+}
+function show_news_tab(news_id,celebrity_id)
+{
+	document.forms[0].action="show-profile?news_id="+news_id+"&celebrity_id="+celebrity_id;
+	document.forms[0].method="post";
+	document.forms[0].submit();
+}
+function showPoliticianProfile(politician_id,news_id,news_source)
+{
+	politician_id=politician_id.trim();
+	news_id=news_id.trim();
+	news_source=news_source.trim();
+	document.forms[0].action="show-profile?politician_news_id="+news_id+"&celebrity_id="+politician_id+"&news_source="+news_source;
+	document.forms[0].method="post";
+	document.forms[0].submit();
+}
+function validateRegistration(index_from)
+{
+	var first_name=$("#first_name").val();
+	var last_name=$("#last_name").val();
+	var contact_no=$("#contact_no").val();
+	var email_id=$("#email_id").val();
+	if(first_name==null || first_name=="")
+		{
+
+		document.getElementById("errName").innerHTML = "Please enter First name";
+		return false;
+		}
+	if(last_name==null || last_name=="")
+	{
+	
+	document.getElementById("errName").innerHTML = "Please enter last name";
+	return false;
+	}
+	if(contact_no==null || contact_no=="")
+	{
+	
+	document.getElementById("errName").innerHTML = "Please enter contact no";
+	return false;
+	}
+	
+	if(email_id==null || email_id=="")
+	{
+	
+	document.getElementById("errName").innerHTML = "Please enter email id";
+	return false;
+	}
+	
+	if(isNaN(contact_no))
+	{
+	
+	document.getElementById("errName").innerHTML = "Please enter valid contact number";
+	return false;
+	}
+
+	var new_password=$("#new_password").val();
+	var confirm_password=$("#confirm_password").val();
+	
+	if(new_password==null || new_password=="")
+	{
+	
+	document.getElementById("errName").innerHTML = "Please enter new password";
+	return false;
+	}
+	if(confirm_password==null || confirm_password=="")
+	{
+		
+	document.getElementById("errName").innerHTML = "Please enter confirm password";
+	return false;
+	}
+	if (new_password.length < 8 || new_password.length > 45) {
+
+		document.getElementById("errName").innerHTML = "Password characters should be between 8 and 45 respectively";
+		return false;
+	}
+	if (confirm_password.length < 8 || confirm_password.length > 45) {
+
+		document.getElementById("errName").innerHTML = "Password characters should be between 8 and 45 respectively";
+		return false;
+	}
+
+	if (new_password != confirm_password) {
+		
+		document.getElementById("errName").innerHTML = "Confirm passwords do not match.";
+		return false;
+	}
+	
+	var index=index_from.value();
+	alert("index..."+index);
+	$.ajax({
+		url:"register",
+		data:"index_from="+index,
+		success:function(res){
+		},
+		error:function(){
+			alert("Somthing wrong");
+		}
+	});
+	
+	
+	return true;
+}
+function loginValidation(index_from)
+{	
+	var index=index_from;
+	alert("index..."+index);
+	$.ajax({
+		url:"login-redirection",
+		data:"index_from="+index,
+		success:function(res){
+		},
+		error:function(){
+			alert("Somthing wrong");
+		}
+	});
+}
+function userLikes(news_id, news_source, celebrity_id)
+{
+	news_id=news_id.trim();
+	news_source=news_source.trim();
+	celebrity_id=celebrity_id.trim();
+	image="resources/assets/images/liked.png";
+		$.ajax({
+			type: "POST",
+			url:'user-likes-function',
+			data:'news_id='+news_id+'&news_source='+news_source+'&celebrity_id='+celebrity_id,
+			success:function(res){
+				alert(res);
+				var json = JSON.parse(res);
+				alert(json);
+				$("#"+news_id+"_"+news_source+"_"+"likes").text(json);
+				$("#"+news_id+"_"+news_source+"_"+"img").attr("src",image);
+				/*$("#likes_count").text(json);
+				$("#like_img").attr("src",image);*/
+			},
+			error:function(){
+				alert("Somthing wrong");
+			}
+		}); 
+}
+function userComments(news_id, news_source, celebrity_id, user_id)
+{
+	var image="resources/assets/images/comments.png";
+	news_id=news_id.trim();
+	news_source=news_source.trim();
+	celebrity_id=celebrity_id.trim();
+	user_id=user_id.trim();
+	var comments=$("#comment").val();
+	if(news_id!='')
+		{
+		NEWS_ID=news_id, 
+		NEWS_SOURCE=news_source, 
+		CELEBRITY_ID=celebrity_id;
+		USER_ID=user_id;
+		}
+	alert("NEWS_ID.."+NEWS_ID+"NEWS_SOURCE.."+NEWS_SOURCE+"USER_ID..."+USER_ID);
+		$.ajax({
+			type: "POST",
+			url:'user-comments-function',
+			data:'news_id='+NEWS_ID+'&news_source='+NEWS_SOURCE+'&celebrity_id='+CELEBRITY_ID+'&comments='+comments,
+			success:function(res){
+				var data = JSON.parse(res);
+				$("#comments-details").empty();
+				for(var i=0;i<data.comments.length;i++)
+				{
+				$("#comments-details").append(
+				/*'<div class="row">'+*/		
+				'<div class="col-md-12" id="single-comments">'+
+				'<div class="col-md-4" id="UserName">'+
+				'<label>'+data.comments[i].user_name+'</label>'+
+				'</div>'+
+				'<div class="col-md-7" id="comment">'+
+				'<label>'+data.comments[i].comments+'</label>'+
+				'</div>'+
+				'<div class="col-sm-1" id="delete_btn_'+i+'">'+
+				'</div>'+
+				/*'</div>'+*/
+				'</div>'
+				);
+				$("#single_comments").append("<div class='col-sm-1'></div>");
+				if(USER_ID==data.comments[i].user_id)
+				{
+				$("#delete_btn_"+i).append(
+				'<a href="#" onclick=delete_comments('+data.comments[i].comment_id+')>Delete</a>'
+				);
+				}
+				
+				$("#"+news_id+"_"+news_source+"_"+"comments").text(data.comments[i].comments_count);
+				$("#"+news_id+"_"+news_source+"_"+"ucommentted").attr("src",image);
+				}
+				
+			},
+			error:function(){
+				alert("Somthing wrong");
+			}
+		}); 
+}
+function delete_comments(comment_id)
+{
+	var image="resources/assets/images/comment-empty.png";
+		$.ajax({
+			type: "POST",
+			url:'user-comments-function',
+			data:'comment_id='+comment_id,
+			success:function(res){
+				var data = JSON.parse(res);
+				$("#comments-details").empty();
+				for(var i=0;i<data.comments.length;i++)
+				{
+					$("#"+news_id+"_"+news_source+"_"+"comments").text(data.comments[i].comments_count);
+					$("#"+news_id+"_"+news_source+"_"+"ucommentted").attr("src",image);
+				}
+			},
+			error:function(){
+				alert("Somthing wrong");
+			}
+		});
+}
+function userUnLikes(delete_like_id,news_id, news_source)
+{
+		news_id=news_id.trim();
+		news_source=news_source.trim();
+			
+	image="resources/assets/images/like.png";
+	delete_like_id=delete_like_id.trim();
+	$.ajax({
+		type: "POST",
+		url:'delete-user-likes',
+		data:'delete_like_id='+delete_like_id+'&news_id='+news_id+'&news_source='+news_source,
+		success:function(res){
+			var json = JSON.parse(res);
+			$("#"+news_id+"_"+news_source+"_"+"likes").text(json);
+			$("#"+news_id+"_"+news_source+"_"+"img").attr("src",image);
+		},
+		error:function(){
+			alert("Somthing wrong");
+		}
+	});
+}

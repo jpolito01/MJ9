@@ -1,0 +1,214 @@
+package admin.model;
+
+public class AdminModel {
+	private String  celebrity_name,  facebook_page, twitter_handle, instagram_page, profile_photo_name, profile_photo_path;
+	private int user_id,news_id,isActive,celebrity_id,party_id,post_id,role_id,web_id,follower_count,follower_id;
+	public int getFollower_id() {
+		return follower_id;
+	}
+	public void setFollower_id(int follower_id) {
+		this.follower_id = follower_id;
+	}
+	private String  post_source, message, image_url, name, story, created_time, id, news_description;
+	private String  news_source, news_description_url, news_url, news_title, publication_date;
+	private String  user_name, password;
+	private String website_name;
+	
+public int getFollower_count() {
+		return follower_count;
+	}
+	public void setFollower_count(int follower_count) {
+		this.follower_count = follower_count;
+	}
+public int getWeb_id() {
+		return web_id;
+	}
+	public void setWeb_id(int web_id) {
+		this.web_id = web_id;
+	}
+public String getWebsite_name() {
+		return website_name;
+	}
+	public void setWebsite_name(String website_name) {
+		this.website_name = website_name;
+	}
+private String  party_name;
+	
+	
+	public String getProfile_photo_name() {
+	return profile_photo_name;
+}
+public void setProfile_photo_name(String profile_photo_name) {
+	this.profile_photo_name = profile_photo_name;
+}
+public String getProfile_photo_path() {
+	return profile_photo_path;
+}
+public void setProfile_photo_path(String profile_photo_path) {
+	this.profile_photo_path = profile_photo_path;
+}
+	public int getRole_id() {
+		return role_id;
+	}
+	public void setRole_id(int role_id) {
+		this.role_id = role_id;
+	}
+	public int getUser_id() {
+		return user_id;
+	}
+	public void setUser_id(int user_id) {
+		this.user_id = user_id;
+	}
+	public String getUser_name() {
+		return user_name;
+	}
+	public void setUser_name(String user_name) {
+		this.user_name = user_name;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public int getNews_id() {
+		return news_id;
+	}
+	public void setNews_id(int news_id) {
+		this.news_id = news_id;
+	}
+	public String getNews_source() {
+		return news_source;
+	}
+	public void setNews_source(String news_source) {
+		this.news_source = news_source;
+	}
+
+	public String getNews_description_url() {
+		return news_description_url;
+	}
+	public void setNews_description_url(String news_description_url) {
+		this.news_description_url = news_description_url;
+	}
+	public String getNews_url() {
+		return news_url;
+	}
+	public void setNews_url(String news_url) {
+		this.news_url = news_url;
+	}
+	public String getNews_title() {
+		return news_title;
+	}
+	public void setNews_title(String news_title) {
+		this.news_title = news_title;
+	}
+	public String getPublication_date() {
+		return publication_date;
+	}
+	public void setPublication_date(String publication_date) {
+		this.publication_date = publication_date;
+	}
+	public int getPost_id() {
+		return post_id;
+	}
+	public void setPost_id(int post_id) {
+		this.post_id = post_id;
+	}
+	public String getPost_source() {
+		return post_source;
+	}
+	public void setPost_source(String post_source) {
+		this.post_source = post_source;
+	}
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
+	}
+	public String getImage_url() {
+		return image_url;
+	}
+	public void setImage_url(String image_url) {
+		this.image_url = image_url;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getStory() {
+		return story;
+	}
+	public void setStory(String story) {
+		this.story = story;
+	}
+	public String getCreated_time() {
+		return created_time;
+	}
+	public void setCreated_time(String created_time) {
+		this.created_time = created_time;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getCelebrity_name() {
+		return celebrity_name;
+	}
+	public void setCelebrity_name(String celebrity_name) {
+		this.celebrity_name = celebrity_name;
+	}
+	public String getFacebook_page() {
+		return facebook_page;
+	}
+	public void setFacebook_page(String facebook_page) {
+		this.facebook_page = facebook_page;
+	}
+	public String getTwitter_handle() {
+		return twitter_handle;
+	}
+	public void setTwitter_handle(String twitter_handle) {
+		this.twitter_handle = twitter_handle;
+	}
+	public String getInstagram_page() {
+		return instagram_page;
+	}
+	public void setInstagram_page(String instagram_page) {
+		this.instagram_page = instagram_page;
+	}
+	public int getIsActive() {
+		return isActive;
+	}
+	public void setIsActive(int isActive) {
+		this.isActive = isActive;
+	}
+	public int getCelebrity_id() {
+		return celebrity_id;
+	}
+	public void setCelebrity_id(int celebrity_id) {
+		this.celebrity_id = celebrity_id;
+	}
+	public int getParty_id() {
+		return party_id;
+	}
+	public void setParty_id(int party_id) {
+		this.party_id = party_id;
+	}
+	public String getParty_name() {
+		return party_name;
+	}
+	public void setParty_name(String party_name) {
+		this.party_name = party_name;
+	}
+	public String getNews_description() {
+		return news_description;
+	}
+	public void setNews_description(String news_description) {
+		this.news_description = news_description;
+	}
+	
+}

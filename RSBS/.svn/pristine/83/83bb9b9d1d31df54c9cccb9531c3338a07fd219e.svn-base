@@ -1,0 +1,323 @@
+package common.controller;
+
+import java.nio.channels.SeekableByteChannel;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
+
+import com.itextpdf.text.log.SysoLogger;
+
+import admin.model.AdminModel;
+
+import common.model.CommonModel;
+import common.services.CommonServices;
+import com.sun.java.swing.plaf.windows.resources.windows;
+@Controller
+public class CommonController {
+@Autowired
+	private CommonServices commonServices;
+
+	public CommonServices getCommonServices() {
+		return commonServices;
+	}
+
+	public void setCommonServices(CommonServices commonServices) {
+		this.commonServices = commonServices;
+	}
+	
+	public Logger logger = Logger.getLogger(this.toString());
+	/**
+	 * This method logs entry for a method
+	 * @param methodName
+	 */
+	protected void methodIn(final String methodName) {
+		if(logger.isDebugEnabled()){
+			logger.debug(String.format(IN,this.getClass().getName(), methodName));
+		}
+	}
+
+	/**
+	 * This method logs out for a method
+	 * @param methodName
+	 */
+	protected void methodOut(final String methodName) {
+		if(logger.isDebugEnabled()){
+			logger.debug(String.format(OUT,this.getClass().getName(), methodName));
+		}
+	}
+	/**
+	 * IN represents log in method
+	 */
+	private static final String IN="%s::%s: IN ";
+
+	/**
+	 * OUT represents log out from method
+	 */
+	private static final String OUT="%s::%s: OUT ";
+	
+	
+	
+	
+	
+	@RequestMapping(value="home",method=RequestMethod.GET)
+	public String homeGet(HttpSession session,ModelMap map)
+	{
+		if(map.get("message")!=null)
+		{
+			map.addAttribute("message",map.get("message"));
+		}
+		if(map.get("error")!=null)
+		{
+			map.addAttribute("error",map.get("error"));
+		}
+		if(session.getAttribute("user_name")==null || session.getAttribute("user_name").equals(""))
+		{
+			session.setAttribute("user_name", "");
+		}
+		//session.invalidate();
+		return "Common/Home";
+	}
+	@RequestMapping(value="login",method=RequestMethod.POST)
+	public String loginPost(AdminModel ad,RedirectAttributesModelMap map,HttpSession session)
+	{
+		UserSession u=new UserSession(session);
+		
+		String user_name=ad.getUser_name();
+		String pass=ad.getPassword();
+		List<AdminModel> login_info=getCommonServices().validate_email(user_name, pass);
+		if(login_info.size()==0)
+		{
+			map.addFlashAttribute("error", "Invalid login credentials.");
+			return "redirect:home";
+		}
+		for(AdminModel a:login_info)
+		{
+			u.setUser_id(a.getUser_id());
+			u.setRole_id(a.getRole_id());
+			u.setUser_name(a.getUser_name());
+			
+		}
+		if(u.getRole_id()==1) // 1 = Admin
+		{ 
+			return "redirect:admin-home";
+		}
+		if(u.getRole_id()==2) // 2 = User
+		{
+			return "redirect:all-politicians";
+		}
+		
+		
+		return "redirect:home";
+	}
+	@RequestMapping(value="login",method=RequestMethod.GET)
+	public String loginGet()
+	{
+		return "redirect:home";
+	}
+   @RequestMapping(value="logout" ,method={RequestMethod.POST,RequestMethod.GET})
+	String logout(ModelMap map,HttpSession session)
+	{
+		methodIn("logout");
+		session.invalidate();
+		windows.clearCache();
+		Runtime.getRuntime().freeMemory();
+		methodOut("logout");
+		return "redirect:home";
+
+	}
+	@RequestMapping(value="all-politicians",method=RequestMethod.GET)
+	public String allPoliticiansGet(HttpSession session,HttpServletRequest request,ModelMap map)
+	{
+		String letter="A";
+		int user_id=0;
+		UserSession u=new UserSession(session);
+		/*if(u.getRole_id()!=1 || u.getRole_id()!=2 || u.getUser_id()==0)
+		{
+			if(u.getRole_id()!=1)
+			{
+				return "redirect:home";
+			}	
+		}*/
+		if(u.getUser_id()>0)
+		{
+			user_id=u.getUser_id();
+		}
+		if(session.getAttribute("letter")!=null && !(session.getAttribute("letter")+"").equals(""))
+		{
+			letter=session.getAttribute("letter").toString();
+		}
+		if(request.getParameter("q")!=null)
+		{
+			letter=request.getParameter("q");
+			if(letter.equals(""))
+			{
+				letter="A";
+			}
+			session.setAttribute("letter", letter);
+		}
+		String q=letter+"%";
+		List<AdminModel> politician_info=getCommonServices().getAllPoliticians(q,user_id);
+		List<AdminModel> politician_follower_count=getCommonServices().getPoliticiansFollowersCount(q);
+		
+		map.addAttribute("politician_info",politician_info);
+		map.addAttribute("politician_follower_count",politician_follower_count);
+		map.addAttribute("latter",letter);
+		
+		return "Common/Politicians";
+	}
+	
+	@RequestMapping(value="follow-politician",method=RequestMethod.POST)
+	public String allPoliticiansPost(HttpServletRequest request,HttpSession session)
+	{
+		UserSession u=new UserSession(session);
+		int user_id=0;
+		if(u.getUser_id()>0)
+		{
+			user_id=u.getUser_id();
+		}
+		if(request.getParameter("celebrity_id")!=null)
+		{
+			int celebrity_id=Integer.parseInt(request.getParameter("celebrity_id"));
+			getCommonServices().addPoliticianFollowers(user_id, celebrity_id);
+		}
+		return "redirect:all-politicians";
+	}
+	
+	@RequestMapping(value="settings", method=RequestMethod.GET)
+	public String settingsGet(@Valid CommonModel c, HttpSession session, ModelMap map)
+	{
+		UserSession u=new UserSession(session);
+		/*if(u.getRole_id()!=1 || u.getRole_id()!=2)
+		{
+			if(u.getRole_id()!=1)
+			{
+				return"redirect:home";
+			}
+			if(u.getRole_id()!=2)
+			{
+				return"redirect:home";
+			}
+		}*/
+		List<CommonModel> getUserInformation=getCommonServices().getUserInformation(u.getUser_id());
+		map.addAttribute("getUserInformation",getUserInformation);
+		if(map.get("error")!=null)
+		{
+			map.addAttribute("error",map.get("error"));
+		}
+		if(map.get("message")!=null)
+		{
+			map.addAttribute("message",map.get("message"));
+		}
+		if(map.get("activeTab")!=null)
+        {
+        	map.addAttribute("activeTab",map.get("activeTab"));
+        }
+		if(map.get("successTabActive")!=null)
+		{
+			map.addAttribute("successTabActive",map.get("successTabActive"));
+		}
+		return "Common/Settings";
+	}
+	
+	@RequestMapping(value="settings", method=RequestMethod.POST)
+	public String settingsPost(@Valid CommonModel c, HttpSession session, RedirectAttributesModelMap redirectAttributes,HttpServletRequest request)
+	{
+		UserSession u=new UserSession(session);
+		
+		if(request.getParameter("activeTab")!=null)
+        {
+        	redirectAttributes.addFlashAttribute("activeTab",request.getParameter("activeTab"));
+        }
+		String first_name=c.getFirst_name();
+		String last_name=c.getLast_name();
+		String contact_no=c.getContact_no();
+		String email_id=c.getEmail_id();
+		if(c.getFirst_name()!=null && request.getParameter("activeTab")==null)
+		{
+			List<CommonModel> getUserInformation=getCommonServices().getUserInformation(u.getUser_id());
+            for(CommonModel co:getUserInformation)
+            {
+            	if(co.getEmail_id().equals(email_id))
+            	{
+        			getCommonServices().updateUserInformation(u.getUser_id(), first_name, last_name, contact_no, email_id);
+            	    redirectAttributes.addFlashAttribute("message","Profile updated successfully.!!!");
+            	}
+            	else{
+            		List<CommonModel> getExistingEmail=getCommonServices().getExistingUser(email_id);
+        			if(!getExistingEmail.isEmpty())
+        			{
+        				redirectAttributes.addFlashAttribute("error","This email id is aulready present");
+        				redirectAttributes.addFlashAttribute("successTabActive",1);
+        				return"redirect:settings";
+        			}
+        			getCommonServices().updateUserInformation(u.getUser_id(), first_name, last_name, contact_no, email_id);
+                    getCommonServices().updateUserCredentials(u.getUser_id(), email_id);
+            	    redirectAttributes.addFlashAttribute("message","Profile updated successfully.!!!");
+            	}
+            }
+            redirectAttributes.addFlashAttribute("successTabActive",1);
+		}
+		return "redirect:settings";
+	}
+	
+	@RequestMapping(value="change-password",method=RequestMethod.POST)
+	public String changePasswordPost(@Valid CommonModel c, HttpSession session,RedirectAttributesModelMap redirectAttributes,HttpServletRequest request)
+	{
+		if(request.getParameter("activeTab")!=null)
+        {
+        	redirectAttributes.addFlashAttribute("activeTab",request.getParameter("activeTab"));
+        }
+		UserSession u=new UserSession(session);
+		
+		String old_password=null,new_password=null,confirm_password=null;
+
+		if(c.getOld_password()!=null && request.getParameter("activeTab")==null)
+		{
+			old_password=c.getOld_password();
+			new_password=c.getNew_password();
+			String password=getCommonServices().getPassword(u.getUser_id());
+			if(!old_password.equals(password))
+			{
+				redirectAttributes.addFlashAttribute("error","Invalid Old Password");
+				redirectAttributes.addFlashAttribute("successTabActive",2);
+				return "redirect:settings";
+			}
+			getCommonServices().updatePassword(u.getUser_id(), new_password);
+			redirectAttributes.addFlashAttribute("message","Password updated successfully.!!!");
+			redirectAttributes.addFlashAttribute("successTabActive",2);
+		}
+		return "redirect:settings";
+	}
+	
+	@RequestMapping(value="register",method=RequestMethod.POST)
+	public String registrationPost(@Valid CommonModel c,HttpSession session,RedirectAttributesModelMap redirectAttributes,HttpServletRequest request)
+	{
+		            int user_id=0;
+            		List<CommonModel> getExistingEmail=getCommonServices().getExistingUser(c.getEmail_id());
+        			if(!getExistingEmail.isEmpty())
+        			{
+        				redirectAttributes.addFlashAttribute("error","This email id is aulready present");
+        				return"redirect:home";
+        			}
+        			getCommonServices().addNewUser(c);
+        			List<CommonModel> getUserId=getCommonServices().getExistingUser(c.getEmail_id());
+        			for(CommonModel co:getUserId)
+        			{
+        				user_id=co.getUser_id();
+        				getCommonServices().addUserCredentials(user_id,c.getEmail_id(), c.getNew_password(), 2);
+                	    redirectAttributes.addFlashAttribute("message","Registered successfully.!!!");
+                	    
+        			}
+        			return "redirect:home";
+	}
+}

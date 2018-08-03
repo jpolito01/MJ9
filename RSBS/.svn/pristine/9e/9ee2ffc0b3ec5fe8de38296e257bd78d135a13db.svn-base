@@ -1,0 +1,64 @@
+package common.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
+import common.model.CommonModel;
+
+import admin.model.AdminModel;
+
+public interface CommonMapper {
+
+		public String VALIDATE_LOGIN="SELECT * FROM user_login u where user_name=#{user_name}  and password =#{password}";
+		@Select(VALIDATE_LOGIN)
+		public List<AdminModel> validate_email(@Param("user_name") String user_name,@Param("password") String password);
+		
+		public String ALL_POLITICIANS="select c.*,u.user_id as follower_id from celebrity_info c left join user_follower_map u on u.celebrity_id=c.celebrity_id and u.user_id=#{user_id} where celebrity_name like #{celebrity_name}";
+		@Select(ALL_POLITICIANS)
+		public List<AdminModel> getAllPoliticians(@Param("celebrity_name") String celebrity_name,@Param("user_id") int user_id);
+		
+		public String POLITITIAN_FOLLOWERS_COUNT="select count(c.celebrity_name) as follower_count,c.celebrity_id,u.user_id as follower_id from celebrity_info c left join user_follower_map u on u.celebrity_id=c.celebrity_id where celebrity_name like #{celebrity_name}";
+		@Select(POLITITIAN_FOLLOWERS_COUNT)
+		public List<AdminModel> getPoliticiansFollowersCount(@Param("celebrity_name") String celebrity_name);
+		
+		public String ADD_FOLLOWERS="insert into user_follower_map(user_id,celebrity_id) values(#{user_id},#{celebrity_id})";
+		@Insert(ADD_FOLLOWERS)
+		public int addPoliticianFollowers(@Param("user_id") int user_id,@Param("celebrity_id") int celebrity_id);
+
+		//10-11-2017 priti
+		public String GET_USER_INFORMATION="select * from anv_rsbs.user_information where user_id=#{user_id}";
+        @Select(GET_USER_INFORMATION)
+        public List<CommonModel> getUserInformation(@Param("user_id") int user_id);
+        
+        public String GET_EXISTING_USER="select user_id,email_id from anv_rsbs.user_information where email_id=#{email_id}";
+        @Select(GET_EXISTING_USER)
+        public List<CommonModel> getExistingUser(@Param("email_id") String email_id);
+        
+        public String UPDATE_USER_INFORMATION="update anv_rsbs.user_information set first_name=#{first_name}, last_name=#{last_name}, contact_no=#{contact_no}, email_id=#{email_id} where user_id=#{user_id}";
+        @Update(UPDATE_USER_INFORMATION)
+        public int updateUserInformation(@Param("user_id") int user_id,@Param("first_name") String first_name, @Param("last_name") String last_name,@Param("contact_no") String contact_no,@Param("email_id") String email_id);
+
+        public String UPDATE_USER_CREDENTIALS="update anv_rsbs.user_login set user_name=#{user_name} where user_id=#{user_id}";
+        @Update(UPDATE_USER_CREDENTIALS)
+        public int updateUserCredentials(@Param("user_id") int user_id,@Param("user_name") String user_name);
+        
+        public String GET_PASSWORD="select password from anv_rsbs.user_login where user_id=#{user_id}";
+        @Select(GET_PASSWORD)
+        public String getPassword(@Param("user_id") int user_id);
+        
+        public String UPDATE_PASSWORD="update anv_rsbs.user_login set password=#{password} where user_id=#{user_id}";
+        @Update(UPDATE_PASSWORD)
+        public int updatePassword(@Param("user_id") int user_id,@Param("password") String password);
+        
+        public String ADD_NEW_USER="insert into anv_rsbs.user_information(first_name, last_name, contact_no, email_id) values(#{first_name}, #{last_name}, #{contact_no}, #{email_id})";
+        @Insert(ADD_NEW_USER)
+        public int addNewUser(CommonModel model);
+        
+        public String ADD_USER_CREDENTIALS="insert into anv_rsbs.user_login(user_id,user_name, password, role_id) values(#{user_id},#{user_name}, #{password}, #{role_id})";
+        @Insert(ADD_USER_CREDENTIALS)
+        public int addUserCredentials(@Param("user_id") int user_id,@Param("user_name") String user_name,@Param("password") String password,@Param("role_id") int role_id);
+}

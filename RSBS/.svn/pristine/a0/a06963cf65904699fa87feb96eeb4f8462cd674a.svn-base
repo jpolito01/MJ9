@@ -1,0 +1,46 @@
+package common.services;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import admin.model.AdminModel;
+import common.mapper.CommonMapper;
+
+public class CommonServiceImpl implements CommonServices {
+
+	private CommonMapper commonMapper;
+
+	public CommonMapper getCommonMapper() {
+		return commonMapper;
+	}
+
+	public void setCommonMapper(CommonMapper commonMapper) {
+		this.commonMapper = commonMapper;
+	}
+	
+	public List<AdminModel> validate_email(String user_name,String password)
+	{
+		
+		return getCommonMapper().validate_email(user_name, password);
+	}
+
+	@Override
+	public List<AdminModel> getAllPoliticians(String celebrity_name, int user_id) {
+	
+		return getCommonMapper().getAllPoliticians(celebrity_name,user_id);
+	}
+
+	@Override
+	public List<AdminModel> getPoliticiansFollowersCount(String celebrity_name) {
+		
+		return getCommonMapper().getPoliticiansFollowersCount(celebrity_name);
+	}
+
+	@Override
+	public int addPoliticianFollowers(int user_id, int celebrity_id) {
+		
+		return getCommonMapper().addPoliticianFollowers(user_id, celebrity_id);
+	}
+	
+}

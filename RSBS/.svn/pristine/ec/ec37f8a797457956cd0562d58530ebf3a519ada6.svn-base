@@ -1,0 +1,194 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+  <%@ taglib prefix="fn"  uri="http://java.sun.com/jsp/jstl/functions" %>>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<%@ include file="/WEB-INF/jsp/insideHeader.jsp" %>
+<div class="container main-container">
+		<div class="col-sm-12">
+			<c:if test="${not empty error}">
+					<div class="alert alert-danger">
+							${error}
+					</div>
+			</c:if>
+		</div>
+		<div class="row" style="margin-top: 25px;">
+				<div class="col-sm-9">
+					<div class="col-sm-12 politician-bio">
+							<div class="col-sm-12">
+								<div class="col-sm-12">
+									<div class="row short-description">
+											<c:forEach items="${celebrity_info}" var="c" varStatus="i">
+											<c:if test="${c.getParty_id()==1}">
+											 <div class="col-sm-2"> 
+															<img src="resources/assets/images/democr.png" width="100%">
+													</div>
+											</c:if>
+											<c:if test="${c.getParty_id()==2}">
+											 <div class="col-sm-2"> 
+															<img src="resources/assets/images/republicans.png" width="100%">
+													</div>
+											</c:if>
+													
+													<div class="col-sm-7">
+															<div class="col-sm-12">
+																<p class="politician-name name-font">${c.getCelebrity_name()}</p>
+																<span class="follower-cnt">${c.getFollower_count()} </span>
+															</div>
+															<div class="col-sm-12">
+																	<p class="politician-info">Nancy Patricia D'Alesandro Pelosi is an American politician who currently serves as the Minority Leader of the United States House of Representatives, representing California's 12th congressional district.</p>
+															</div>
+															<div class="col-sm-12">
+																	<button type="button" class="red1">Follow</button>
+															</div>
+													</div>
+												<div class="col-sm-3">
+														<img src="image${c.getProfile_photo_path()}" width="100%">
+												</div>
+											</c:forEach>
+								</div>
+							</div>
+							</div>
+							<div class="col-sm-12">
+							<div class="col-sm-12 div-nav">
+									<ul class="nav nav-pills nav-justified">
+										  <li class="nav-item">
+										    <a id="all_post"  class="nav-link<c:if test="${active_tab=='all_post'}"> active</c:if>" href="show-profile?tab=all_post">All Post</a>
+										  </li>
+										  <li class="nav-item">
+										    <a id="facebook" class="nav-link<c:if test="${active_tab=='facebook'}"> active</c:if>" href="show-profile?tab=facebook">Facebook</a>
+										  </li>
+										  <li class="nav-item">
+										    <a id="twitter"  class="nav-link<c:if test="${active_tab=='twitter'}"> active</c:if>" href="show-profile?tab=twitter">Twitter</a>
+										  </li>
+										  <li class="nav-item">
+										    <a id="instagram"  class="nav-link<c:if test="${active_tab=='instagram'}"> active</c:if>" href="show-profile?tab=instagram">Instagram</a>
+										  </li>
+										  <li class="nav-item">
+										    <a id="news"  class="nav-link<c:if test="${active_tab=='news'}"> active</c:if>" href="show-profile?tab=news">News </a>
+										  </li>
+									</ul>
+							</div>
+							</div>
+							<div class="col-sm-12">
+									<div class="row">
+										<c:forEach begin="0" end="1" var="col">
+													<div class="col-sm-6">
+															<div class="col-sm-12">
+																<c:forEach items="${news_post}" var="np" varStatus="in">
+																	<c:if test="${in.index%2==col}">
+																		<div class="row news-card">
+																				<div class="col-sm-12 pull-right">
+																						<span>${np.getPublication_date()} </span>
+																				</div>
+																				<div class="col-sm-1">
+																					<c:set var="flag" value="0"></c:set>
+																					<c:set var="post_icon" value="resources/assets/images/news.png"></c:set>
+																					<c:if test="${np.getNews_source()=='Facebook'}">
+																							<c:set var="post_icon" value="resources/assets/images/fb.png"></c:set>
+																							
+																					</c:if>
+																					<c:if test="${np.getNews_source()=='Twitter'}">
+																							<c:set var="flag" value="1"></c:set>
+																							<c:set var="post_icon" value="resources/assets/images/twitter.png"></c:set>
+																					</c:if>
+																					<c:if test="${np.getNews_source()=='Instagram'}">
+																							<c:set var="flag" value="1"></c:set>
+																							<c:set var="post_icon" value="resources/assets/images/instagram.png"></c:set>
+																					</c:if>
+																						<img src="${post_icon}" width="40px">
+																				</div>
+																				<div class="col-sm-11">
+																						<div class="col-sm-12">
+																								<%-- <span class="news-text"> ${np.getNews_title()} </span> --%>
+																								<p class="news-text">
+																								<c:set var="more_title" value="${np.getNews_title()}"/>
+																										 <%
+																										    String more_title = ""; 
+																										 	String text=(String)pageContext.getAttribute("more_title");
+																										 	text=text.replace("?", "");
+																										 	if(text.length()>199)
+																										 	{
+																										 		text=text.substring(0, 199);
+																										 	}
+																										 	more_title = (String)pageContext.getAttribute("more_title");   //No exception.
+																										 	more_title=more_title.replace("\'", "\\'");
+																										 	more_title=more_title.replace("?", "");
+																										 %>
+																										<c:if test="${fn:length(more_title)>199}">
+																												<%=text%>.
+																												<a href="#" onclick="readMore('<%=more_title%>')">Read More</a>
+																										</c:if>
+																										<c:if test="${fn:length(np.getNews_title())<199}">
+																													<%=text%>
+																										</c:if>
+																								</p>
+																						</div>	
+																						<c:if test="${not empty np.getImage_url() and  np.getImage_url()!='null'}">
+																								<div class="col-sm-12">
+																									<hr>
+																									<c:if test="${flag==1}">
+																											<img src="${np.getImage_url()}" width="100%">
+																									</c:if>
+																									<c:if test="${flag==0}">
+																											<div align="center"><img src="${np.getImage_url()}" width="200px" height="200px"></div>
+																									</c:if>
+																								</div>
+																						</c:if>
+																				</div>
+																				<div class="col-sm-12">
+																					<hr>
+																					<a href="#"><img src="resources/assets/images/like.png" width="35px" height="35px"></a>
+																					<a href="#"> <img src="resources/assets/images/comment-empty.png" width="35px" height="35px"></a>
+																				</div>
+																		</div>
+																	</c:if>
+																</c:forEach>
+																
+															</div>
+													</div>
+											</c:forEach>
+									</div>
+							</div>
+				</div>
+				
+		</div>
+		<div class="col-sm-3">
+						<div class="col-sm-12">
+								<div class="col-sm-12 title-bar">
+										<label> Suggested </label>
+								</div>
+								<c:forEach var="s" items="${suggested_politician}">
+										<div class="row suggested-cards" >
+												<div class="col-sm-12">
+														<img src="image${s.getProfile_photo_path()}" width="100%">
+												</div>
+												<div class="col-sm-12">
+													<div class="col-sm-12 suggested-follow">	
+															<div class="row">
+																	<div class="col-sm-7">
+																				<span class="celebrity_name"> ${s.getCelebrity_name()}  </span><br />
+																				<span class="follower-cnt">11 Followers </span>
+																	</div>
+																	<div class="col-sm-5 div-follow">
+																			<button type="button" class="red1"> Follow </button>
+																	</div>
+															</div>
+													</div>
+												</div>
+										</div>
+									</c:forEach>
+						</div>
+				</div>
+		
+</div>
+</div>
+
+
+</body>
+</html>

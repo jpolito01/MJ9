@@ -1,0 +1,164 @@
+package common.services;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import admin.model.AdminModel;
+import common.mapper.CommonMapper;
+import common.model.CommonModel;
+
+public class CommonServiceImpl implements CommonServices {
+
+	private CommonMapper commonMapper;
+
+	public CommonMapper getCommonMapper() {
+		return commonMapper;
+	}
+
+	public void setCommonMapper(CommonMapper commonMapper) {
+		this.commonMapper = commonMapper;
+	}
+	
+	/*Added By Snigdha 10/11/2017*/
+	@Override
+	public List<AdminModel> getPostCount()
+	{
+		return getCommonMapper().getPostCount();
+	}
+	
+	@Override
+	public List<AdminModel> getNewsCount()
+	{
+		return getCommonMapper().getNewsCount();
+				
+	}
+	@Override
+	public List<AdminModel> getTop_news(@Param("celebrity_id") int celebrity_id)
+	{
+		return getCommonMapper().getTop_news(celebrity_id);
+	}
+	@Override
+	public List<AdminModel> getPopularFour_news(int celebrity_id)
+	{
+		return getCommonMapper().getPopularFour_news(celebrity_id);
+	}
+	@Override
+	public List<AdminModel> getAllPost_news()
+	{
+		return getCommonMapper().getAllPost_news();
+	}
+	@Override
+	public List<AdminModel> getAllPostnews_ById(int celebrity_id)
+	{
+		return getCommonMapper().getAllPostnews_ById(celebrity_id);
+	}
+	@Override
+	public List<AdminModel> getFacebook_post(int celebrity_id)
+	{
+		return getCommonMapper().getAll_SocialMediaPost("Facebook",celebrity_id);
+	}
+	@Override
+	public List<AdminModel> getInstagram_post(int celebrity_id)
+	{
+		return getCommonMapper().getAll_SocialMediaPost("Instagram",celebrity_id);
+	}
+	@Override
+	public List<AdminModel> getTwitter(int celebrity_id)
+	{
+		return getCommonMapper().getAll_SocialMediaPost("Twitter",celebrity_id);
+	}
+	
+	@Override
+	public List<AdminModel> getAll_news(int celebrity_id)
+	{
+		return getCommonMapper().getAll_news(celebrity_id);
+	}
+	@Override
+	public List<AdminModel> getCelebrity_info(int celebrity_id)
+	{
+		return getCommonMapper().getCelebrity_info(celebrity_id);
+	}
+	@Override
+	public List<AdminModel> getSuggested_politician(int celebrity_id)
+	{
+		return getCommonMapper().getSuggested_politician(celebrity_id);
+	}
+/*-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+	
+	
+	@Override
+	public List<AdminModel> validate_email(String user_name,String password)
+	{
+		
+		return getCommonMapper().validate_email(user_name, password);
+	}
+
+	@Override
+	public List<AdminModel> getAllPoliticians(String celebrity_name, int user_id) {
+	
+		return getCommonMapper().getAllPoliticians(celebrity_name,user_id);
+	}
+
+	@Override
+	public List<AdminModel> getPoliticiansFollowersCount(String celebrity_name) {
+		
+		return getCommonMapper().getPoliticiansFollowersCount(celebrity_name);
+	}
+
+	@Override
+	public int addPoliticianFollowers(int user_id, int celebrity_id) {
+		
+		return getCommonMapper().addPoliticianFollowers(user_id, celebrity_id);
+	}
+
+	@Override
+	public List<CommonModel> getUserInformation(int user_id) {
+		
+		return getCommonMapper().getUserInformation(user_id);
+	}
+
+	@Override
+	public List<CommonModel> getExistingUser(String email_id) {
+		
+		return getCommonMapper().getExistingUser(email_id);
+	}
+
+	@Override
+	public int updateUserInformation(int user_id, String first_name,
+			String last_name, String contact_no, String email_id) {
+		
+		return getCommonMapper().updateUserInformation(user_id, first_name, last_name, contact_no, email_id);
+	}
+
+	@Override
+	public int updateUserCredentials(int user_id, String user_name) {
+
+		return getCommonMapper().updateUserCredentials(user_id, user_name);
+	}
+
+	@Override
+	public String getPassword(int user_id) {
+		
+		return getCommonMapper().getPassword(user_id);
+	}
+
+	@Override
+	public int updatePassword(int user_id, String password) {
+		
+		return getCommonMapper().updatePassword(user_id, password);
+	}
+
+	@Override
+	public int addNewUser(CommonModel model) {
+		
+		return getCommonMapper().addNewUser(model);
+	}
+
+	@Override
+	public int addUserCredentials(int user_id,String user_name, String password, int role_id) {
+
+		return getCommonMapper().addUserCredentials(user_id,user_name, password, role_id);
+	}
+	
+}

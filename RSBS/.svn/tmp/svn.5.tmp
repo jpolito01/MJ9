@@ -1,0 +1,115 @@
+function validateUserProfile()
+{
+	var first_name=$("#first_name").val();
+	var last_name=$("#last_name").val();
+	var contact_no=$("#contact_no").val();
+	var email_id=$("#email_id").val();
+	if(first_name==null || first_name=="")
+		{
+		$(".errorMsg").text("Please enter First name");
+		$("#errorModal").modal('show');
+		return false;
+		}
+	if(last_name==null || last_name=="")
+	{
+	$(".errorMsg").text("Please enter last name");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	if(contact_no==null || contact_no=="")
+	{
+	$(".errorMsg").text("Please enter contact no");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	
+	if(email_id==null || email_id=="")
+	{
+	$(".errorMsg").text("Please enter email id");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	
+	if(isNaN(contact_no))
+	{
+	$(".errorMsg").text("Please enter valid contact number");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	
+	return true;
+}
+function validatePassword()
+{
+	var old_password=$("#old_password").val();
+	var new_password=$("#new_password").val();
+	var confirm_password=$("#confirm_password").val();
+	if(old_password==null || old_password=="")
+	{
+	$(".errorMsg").text("Please enter old password");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	if(new_password==null || new_password=="")
+	{
+	$(".errorMsg").text("Please enter new password");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	if(confirm_password==null || confirm_password=="")
+	{
+	$(".errorMsg").text("Please enter confirm password");
+	$("#errorModal").modal('show');
+	return false;
+	}
+	if (new_password.length < 8 || new_password.length > 45) {
+
+		$(".errorMsg").text(
+				"Password characters should be between 8 and 45 respectively");
+		$("#errorModal").modal('show');
+		return false;
+	}
+	if (confirm_password.length < 8 || confirm_password.length > 45) {
+
+		$(".errorMsg").text(
+				"Password characters should be between 8 and 45 respectively");
+		$("#errorModal").modal('show');
+		return false;
+	}
+
+	if (new_password != confirm_password) {
+
+		$(".errorMsg").text("Confirm passwords do not match");
+		$("#errorModal").modal('show');
+		return false;
+	}
+	
+	return true;
+}
+function activeSideNav(index)
+{
+	if(index==1)
+		{
+		document.getElementById("edit_profile").action="settings?activeTab="+index;
+		document.getElementById("edit_profile").method="post";
+		document.getElementById("edit_profile").submit();
+		}
+	if(index==2)
+	{
+	document.getElementById("changePassword").action="change-password?activeTab="+index;
+	document.getElementById("changePassword").method="post";
+	document.getElementById("changePassword").submit();
+	}
+	if(index==3)
+	{
+	document.getElementById("user_follows").action="followers?activeTab="+index;
+	document.getElementById("user_follows").method="post";
+	document.getElementById("user_follows").submit();
+	}
+}
+function unfollowCelebrity(follow_id)
+{
+	document.getElementById("user_follows").action="followers?follow_id="+follow_id;
+	document.getElementById("user_follows").method="post";
+	document.getElementById("user_follows").submit();
+}

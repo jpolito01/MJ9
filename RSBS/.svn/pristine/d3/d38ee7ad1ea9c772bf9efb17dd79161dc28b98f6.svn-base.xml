@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:cache="http://www.springframework.org/schema/cache"
+	   xsi:schemaLocation="
+        http://www.springframework.org/schema/beans    
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd"> 
+        
+        <mvc:annotation-driven/>
+		 <mvc:resources location="/WEB-INF/" mapping="/resources/**" />
+		 <mvc:resources location="file:C:\\PoliticianPhotoes\\" mapping="/image/**" />
+		  <!-- <mvc:resources mapping="/resources/images/**" location="/resources/" /> -->
+		  <!-- <mvc:resources location="file:C:\\ManageMyFunction\\" mapping="/image/**" /> -->
+		<!-- Controller  -->
+		
+		 <context:component-scan base-package="admin.controller"/>
+	 <context:component-scan base-package="common.controller"/>
+			<!--<context:component-scan base-package="user.Controller" /> -->
+		
+		<bean id="viewResolver"
+			class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+			<property name="order" value="2"/>
+			<property name="prefix">
+				<value>/WEB-INF/jsp/</value>
+			</property>
+			<property name="suffix">
+				<value>.jsp</value>
+			</property>
+		</bean>
+	
+	<!--configure the multipart resolver  --> 
+     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">     
+     <property name="maxUploadSize" value="100000000"></property> 
+    </bean>
+
+	<!-- Mapper Classes -->
+	
+	<bean id="adminMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+	  	<property name="mapperInterface" value="admin.mapper.AdminMapper" />
+	  	<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean> 
+	<bean id="commonMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="common.mapper.CommonMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean> 
+	<!-- <bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="user.Mapper.UserMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean>	 -->
+	
+	 <!-- Service Classes -->
+	
+	<bean id="adminServices" class="admin.services.AdminServiceImpl">
+		<property name="adminMapper" ref="adminMapper" />
+	</bean>
+	 <bean id="commonServices" class="common.services.CommonServiceImpl">
+		<property name="commonMapper" ref="commonMapper" />
+	</bean>
+	<!--<bean id="userServices" class="user.Services.UserServicesImpl">
+		<property name="userMapper" ref="userMapper" />
+	</bean> -->
+	
+<!--  ******************* sql session factory *********************  -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url">
+			<value>jdbc:mysql://localhost:3306/anv_rsbs</value>
+		</property>
+		<property name="username">
+			<value>root</value> 
+			
+		</property>
+		<property name="password">
+			  <value>root</value> 
+			
+		</property>
+	</bean>
+
+</beans>

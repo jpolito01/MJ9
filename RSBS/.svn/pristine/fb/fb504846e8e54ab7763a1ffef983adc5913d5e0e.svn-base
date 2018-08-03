@@ -1,0 +1,211 @@
+var PARTY_ID=0,DELETE_PARTY_ID=0,DELETE_WEB_ID=0,DELETE_CELEBRITY_ID=0,SEARCH_KEY_ID=0,SEARCH_KEY=null,DELETE_SEARCH_KEY_ID=0;
+function ActivateDeactivate(celebrity_id, flag)
+{
+	document.getElementById("show_celeb").action="manage-politician?ActDctCelebrityId="+celebrity_id+"&flag="+flag;
+	document.getElementById("show_celeb").method="POST";
+	document.getElementById("show_celeb").submit();
+}
+function EditCelebrity(celebrity_id)
+{
+	$.ajax({
+			url:"set-attributes",
+			data:"celebId_edit="+celebrity_id,
+			success:function(res){
+				var json = JSON.parse(res);
+				$("input[id='celebrity_name_e']").val(json.celebrity_name);
+				$("select[id='party_id_e']").val(json.party_id);
+				$("input[id='facebook_page_e']").val(json.facebook_page);
+				$("input[id='twitter_handle_e']").val(json.twitter_data);
+				$("input[id='instagram_page_e']").val(json.instagram_page);
+				$('#bio_e').text(json.bio);
+				document.getElementById("profile_pic").src="image"+json.profile_photo;
+				$("select[id='state_id_e']").val(json.state_id);
+				for(var i=0;i<json.category_details.length;i++)
+				{
+					var category_id=json.category_details[i].category_id;
+					$("#"+category_id).attr("checked","true");
+				}
+			},
+			error:function(){
+				alert("Somthing wrong");
+			}
+		});
+}
+function ViewCelebrity(celebrity_id)
+{
+	$.ajax({
+		url:"show-celebrity",
+		data:"celebId_show="+celebrity_id,
+		success:function(res){
+			alert(res);
+			var json = JSON.parse(res);
+
+			$('#celebrity_name_v').text(json.celebrity_name);
+			$('#party_name_v').text(json.party_name);
+			$('#facebook_page_v').text(json.facebook_page);
+			$('#twitter_handle_v').text(json.twitter_data);
+			$('#instagram_page_v').text(json.instagram_page);
+			$('#bio_v').text(json.bio);
+			$('#state_name_v').text(json.state);
+			document.getElementById("profile_pic_v").src="image"+json.profile_photo;
+			$("#pol_category").empty();
+			if(json.category_details.length>0)
+				{
+				$('#category').text("Categories");
+				}
+			for(var i=0;i<json.category_details.length;i++)
+				{
+				$("#pol_category").append(
+					'<div class="row">'+
+					'<div class="col-md-12">'+
+					'<label>'+json.category_details[i].category_name+'</label>'+
+					'</div>'+
+					'</div>'
+				);
+				}
+		},
+		error:function(){
+			alert("Something wrong");
+		}
+	});
+}
+function deleteBlackList_website(web_id)
+{	
+	web_id=web_id.trim();
+	if(web_id!='')
+		{
+		DELETE_WEB_ID=web_id;
+		$("#delete_website").modal("show");
+		}
+	else{
+		document.getElementById("blacklist").action="blacklist-website?delete_web_id="+DELETE_WEB_ID;
+		document.getElementById("blacklist").method="POST";
+		document.getElementById("blacklist").submit();
+		DELETE_PARTY_ID=0;
+	}
+}
+function editBlackList_website(website_name,web_id)
+{
+	website_name=website_name.trim();
+	web_id=web_id.trim();
+	
+	if(website_name!='' && web_id!='')
+		{
+		WEB_ID=web_id;
+			$("#edit_blacklist_website").modal("show");
+			$("input[name='edited_website_name']").val(website_name);
+		}
+	else{
+		var website=$("input[name='edited_website_name']").val();
+		document.getElementById("blacklist").action="blacklist-website?edit_web_id="+WEB_ID+"&website_name="+website;
+		document.getElementById("blacklist").method="POST";
+		document.getElementById("blacklist").submit();
+		WEB_ID=0;
+	}
+	
+}
+function editParty(party_name,party_id)
+{
+	party_name=party_name.trim();
+	party_id=party_id.trim();
+	
+	if(party_name!='' && party_id!='')
+		{
+		PARTY_ID=party_id;
+		$("#edit_party_name").modal("show");
+		$("input[name='edited_party_name']").val(party_name);
+		}
+	else{
+		var party=$("input[name='edited_party_name']").val();
+		document.getElementById("manage-parties").action="manage-parties?edit_party_id="+PARTY_ID+"&party_name="+party;
+		document.getElementById("manage-parties").method="POST";
+		document.getElementById("manage-parties").submit();
+		PARTY_ID=0;
+	}
+}
+function deleteParty(party_id)
+{
+	party_id=party_id.trim();
+	if(party_id!='')
+		{
+		DELETE_PARTY_ID=party_id;
+		$("#delete_party").modal("show");
+		}
+	else{
+		document.getElementById("manage-parties").action="manage-parties?delete_party_id="+DELETE_PARTY_ID;
+		document.getElementById("manage-parties").method="POST";
+		document.getElementById("manage-parties").submit();
+		DELETE_PARTY_ID=0;
+	}
+}
+function deleteCelebrity(celebrity_id)
+{
+	celebrity_id=celebrity_id.trim();
+	if(celebrity_id!='')
+		{
+		DELETE_CELEBRITY_ID=celebrity_id;
+		}
+	else{
+		document.getElementById("show_celeb").action="manage-politician?delete_celebrity_id="+DELETE_CELEBRITY_ID;
+		document.getElementById("show_celeb").method="POST";
+		document.getElementById("show_celeb").submit();
+		DELETE_CELEBRITY_ID=0;
+	}
+}
+function getSearchKeyId(search_key_id,search_key)
+{
+	search_key=search_key.trim();
+	search_key_id=search_key_id.trim();
+
+	if(search_key!='' && search_key_id!='')
+		{
+		DELETE_SEARCH_KEY_ID=search_key_id;
+		SEARCH_KEY=search_key;
+		$("#AddPoliticianModal").modal("show");
+		$("input[name='celebrity_name']").val(search_key);
+		}
+	else{
+	$('#search_key_id').val(DELETE_SEARCH_KEY_ID);
+	}
+	
+}
+function EditPoliticianName(search_key_id,search_key)
+{
+	search_key=search_key.trim();
+	search_key_id=search_key_id.trim();
+
+	if(search_key!='' && search_key_id!='')
+		{
+		SEARCH_KEY_ID=search_key_id;
+		SEARCH_KEY=search_key;
+		$("#editPoliticianModal").modal("show");
+		$("input[name='search_key']").val(search_key);
+		}
+	else{
+		var search_name=$("input[name='search_key']").val();
+		document.getElementById("add-search-key").action="search-keys?edit_search_key_id="+SEARCH_KEY_ID+"&search_key_name="+search_name;
+		document.getElementById("add-search-key").method="POST";
+		document.getElementById("add-search-key").submit();
+		SEARCH_KEY_ID=0
+		SEARCH_KEY=null
+	}
+}
+function deletePoliticianInfo(search_key_id,search_key)
+{
+	search_key_id=search_key_id.trim();
+	search_key=search_key.trim();
+
+	if(search_key!='' && search_key_id!='')
+		{
+		SEARCH_KEY=search_key;
+		SEARCH_KEY_ID=search_key_id;
+		$("#deletePoliticianModal").modal("show");
+		}
+	else{
+		document.getElementById("add-search-key").action="search-keys?delete_search_key_id="+SEARCH_KEY_ID+"&delete_search_key="+SEARCH_KEY;
+		document.getElementById("add-search-key").method="POST";
+		document.getElementById("add-search-key").submit();
+		SEARCH_KEY_ID=0;
+		SEARCH_KEY=null;
+	}
+}

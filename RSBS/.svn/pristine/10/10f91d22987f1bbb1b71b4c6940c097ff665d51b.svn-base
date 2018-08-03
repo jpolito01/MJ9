@@ -1,0 +1,167 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+ <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"  %>
+ <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+ 
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body style="background-color: #f2f2f2;">
+<%@ include file="/WEB-INF/jsp/header.jsp"%>
+<div class="container main-container">
+		<div class="col-sm-12">
+			<c:if test="${not empty error}">
+					<div class="alert alert-danger">
+							${error}
+					</div>
+			</c:if>
+		</div>
+		<div class="col-sm-12">
+			<div class="col-sm-12 first-part">
+					<div class="row">
+							<c:forEach var="tn" items="${top_news }">
+										<div class="col-sm-6 first-part-img">
+												<img src="image${tn.getProfile_photo_path()}" width="100%">
+										</div>
+										<div class="col-sm-5">
+												<p class="first-part-text"> ${tn.getNews_title()}</p>
+										</div>
+							</c:forEach>
+					</div>
+				</div>
+		</div>
+		<div class="col-sm-12 news-part">
+				<div class="row">
+				<c:forEach var="p" items="${popular_news}">
+					<div class="col-sm-3 news-card">
+							<div class="news-img">
+								<img src="image${p.getProfile_photo_path()}" width="100%">
+							</div>
+							<div class="contents">
+									${p.getNews_title()}
+							</div>
+					</div>
+				</c:forEach>
+				</div>
+		</div>
+		<div class="row more-stories">
+			<div class="col-sm-8">
+				<div class="col-sm-12">
+						<div class="col-sm-12  title-bar">	<label> More Stories</label> </div>
+				</div>
+				<div class="col-sm-12 stories-details">
+						<div class="row">
+							<c:forEach begin="0" end="1" var="col">
+								<div class="col-sm-6">
+										<c:forEach var="ap" items="${all_post}" varStatus="i">
+												<c:if test="${i.index%2==col}">
+															<div class="col-sm-12 stories">
+																	<c:if test="${ap.getNews_source()=='Twitter' or ap.getNews_source()=='Instagram'}">
+																		<div class="row">
+																			<c:if test="${not empty ap.getImage_url() ||ap.getImage_url()!='' }">
+																						<div class="col-sm-12 ">
+																								<img src="${ap.getImage_url()}" width="100%">
+																						</div>
+																			</c:if>
+																					<div class="col-sm-12">
+																						<hr>
+																							<p class="news-title"> ${fn:substring(ap.getNews_title(), 0, 120)}.... </p>
+																					</div>
+																					<div class="col-sm-12 btn-read-more">
+																								<c:if test="${ap.getParty_id()==1}">
+																											<button type="button" class="red1">Read more</button>
+																									</c:if>
+																									<c:if test="${ap.getParty_id()==2}">
+																											<button type="button" class="blue1">Read more</button>
+																									</c:if>
+																					</div>		
+																			</div>
+																	</c:if>
+																	<c:if test="${ap.getNews_source()!='Twitter' and ap.getNews_source()!='Instagram'}">
+																		<div class="row">
+																					<c:set var="div_style" value="col-sm-12"></c:set>
+																					<c:if test="${ap.getImage_url()!='null'}">
+																							<c:set var="div_style" value="col-sm-6"></c:set>
+																					</c:if>
+																					<div class="${div_style}">
+																							<c:if test="${ap.getImage_url()!='null'}">
+																									<img src="${ap.getImage_url()}" width="100%">
+																							</c:if>
+																					</div>
+																					<div class="${div_style}">
+																									<p class="news-title">
+																												${fn:substring(ap.getNews_title(), 0, 90)}....
+																									 </p>
+																									 <div class="btn-read-more">
+																									 <c:if test="${ap.getParty_id()==1}">
+																											<button type="button" class="red1">Read more</button>
+																									</c:if>
+																									<c:if test="${ap.getParty_id()==2}">
+																											<button type="button" class="blue1">Read more</button>
+																									</c:if>
+																									</div>
+																					</div>
+																				
+																			</div>
+																	</c:if>
+																</div>
+													</c:if>
+										</c:forEach>
+									</div>
+							</c:forEach>
+										
+						</div>
+				</div>
+				<div class="col-sm-12">
+						<div class="col-sm-12  title-bar">	<label> Most Popular</label> </div>
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="row">
+								<c:forEach var="s" begin="1" end="5" varStatus="i">
+										<div class="col-sm-6">
+											<div class="col-sm-12 popular-people">
+												<div class="row">
+														<div class="col-sm-5">
+																<img src="resources/assets/images/${s}.jpg" width="100%">
+														</div>
+														<div class="col-sm-7 people-des">
+														 			name of politician....dcc c dcd c vf vf 
+														</div>
+												</div>
+											</div>
+										</div>
+								</c:forEach>
+								</div>
+								</div>
+						</div>
+				</div>
+			</div>
+			
+			<div class="col-sm-4">
+				<div class="col-sm-12 title-bar">
+						<label>Polytician Of the day</label>
+				</div>
+				<div class="col-sm-12 description">
+						<div class="col-sm-12 pod-image">
+							<img src="resources/assets/images/1.jpg" width="100%">
+						</div>
+						<div class="col-sm-12 pod-title">
+								Barack Obama
+						</div>
+						<div class="col-sm-12 pod-text">
+									<p>Barack Hussein Obama II is an American politician who served as the 44th President of the United States from 2009 to 2017. He is the first African American to have served as president </p>
+						</div>
+				</div>
+			</div>
+		</div>
+</div>
+
+<!-- //Century Schoolbook -->
+
+	
+</body>
+</html>

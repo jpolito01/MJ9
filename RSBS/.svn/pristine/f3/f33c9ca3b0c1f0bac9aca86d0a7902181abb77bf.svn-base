@@ -1,0 +1,700 @@
+package common.controller;
+
+import java.nio.channels.SeekableByteChannel;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
+
+import com.itextpdf.text.log.SysoLogger;
+
+import admin.model.AdminModel;
+
+import common.model.CommonModel;
+import common.services.CommonServices;
+import com.sun.java.swing.plaf.windows.resources.windows;
+@Controller
+public class CommonController {
+@Autowired
+	private CommonServices commonServices;
+
+	public CommonServices getCommonServices() {
+		return commonServices;
+	}
+
+	public void setCommonServices(CommonServices commonServices) {
+		this.commonServices = commonServices;
+	}
+	
+	public Logger logger = Logger.getLogger(this.toString());
+	/**
+	 * This method logs entry for a method
+	 * @param methodName
+	 */
+	protected void methodIn(final String methodName) {
+		if(logger.isDebugEnabled()){
+			logger.debug(String.format(IN,this.getClass().getName(), methodName));
+		}
+	}
+
+	/**
+	 * This method logs out for a method
+	 * @param methodName
+	 */
+	protected void methodOut(final String methodName) {
+		if(logger.isDebugEnabled()){
+			logger.debug(String.format(OUT,this.getClass().getName(), methodName));
+		}
+	}
+	/**
+	 * IN represents log in method
+	 */
+	private static final String IN="%s::%s: IN ";
+
+	/**
+	 * OUT represents log out from method
+	 */
+	private static final String OUT="%s::%s: OUT ";
+	
+	
+	
+	
+	
+	@RequestMapping(value="home",method=RequestMethod.GET)
+	public String homeGet(HttpSession session,ModelMap map)
+	{
+		if(map.get("message")!=null)
+		{
+			map.addAttribute("message",map.get("message"));
+		}
+		if(map.get("error")!=null)
+		{
+			map.addAttribute("error",map.get("error"));
+		}
+		if(session.getAttribute("user_name")==null || session.getAttribute("user_name").equals(""))
+		{
+			session.setAttribute("user_name", "");
+		}
+	/*Added By Snigdha 10/11/2017*/
+			List<AdminModel> news_count=getCommonServices().getNewsCount();
+			List<AdminModel> post_count=getCommonServices().getPostCount();
+			List<AdminModel> count=new ArrayList<>();
+			
+			int total_count=0;
+			if(news_count.size()>post_count.size())
+			{
+						for(AdminModel n:news_count)
+						{
+							total_count=n.getNews_count();
+								for(AdminModel p:post_count)
+								{
+									if(n.getCelebrity_id()==p.getCelebrity_id())
+									{
+										total_count=total_count+p.getPost_count();
+									}
+								}
+							n.setNews_count(total_count);
+						}
+				count=news_count;
+			}
+			else
+			{
+						for(AdminModel p:post_count)
+						{
+							total_count=p.getPost_count();
+								for(AdminModel n:news_count)
+								{
+									if(n.getCelebrity_id()==p.getCelebrity_id())
+									{
+										total_count=total_count+n.getNews_count();
+									}
+								}
+							p.setNews_count(total_count);
+						}
+						count=post_count;
+			}
+			for(int i=0;i<count.size();i++)
+			{
+					for(int j=i+1;j<count.size();j++)
+					{
+							if(count.get(i).getNews_count()<count.get(j).getNews_count())
+							{
+								AdminModel temp=count.get(i);
+								count.set(i, count.get(j));
+								count.set(j, temp);
+							}
+					}
+			}
+			int populart_celebrity_id=0;
+			int cnt=count.size()-1;
+			
+			for(AdminModel ad:count)
+			{
+				/*if(cnt==0)
+				{
+					populart_celebrity_id=ad.getCelebrity_id();
+					cnt++;
+				}*/
+				if(cnt==count.size()-1)
+				{
+					populart_celebrity_id=ad.getCelebrity_id();
+				}
+			}
+			
+			List<AdminModel> top_news=getCommonServices().getTop_news(populart_celebrity_id);
+			List<AdminModel> popular_news=getCommonServices().getPopularFour_news(populart_celebrity_id);
+			List<AdminModel> all_post_news=getCommonServices().getAllPost_news();
+			
+			map.addAttribute("popular_news",popular_news);
+			map.addAttribute("top_news", top_news);
+			map.addAttribute("all_post", all_post_news);
+			/* First part celebrity id : */
+			
+	/*-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+		return "Common/Home";
+	}
+	@RequestMapping(value="login",method=RequestMethod.POST)
+	public String loginPost(AdminModel ad,RedirectAttributesModelMap map,HttpSession session,HttpServletRequest request)
+	{
+		UserSession u=new UserSession(session);
+		String user_name=ad.getUser_name();
+		String pass=ad.getPassword();
+		List<AdminModel> login_info=getCommonServices().validate_email(user_name, pass);
+		if(login_info.size()==0)
+		{
+			map.addFlashAttribute("error", "Invalid login credentials.");
+			return "redirect:home";
+		}
+		for(AdminModel a:login_info)
+		{
+			u.setUser_id(a.getUser_id());
+			u.setRole_id(a.getRole_id());
+			u.setUser_name(a.getUser_name());
+			
+		}
+		if(u.getRole_id()==1) // 1 = Admin
+		{ 
+			return "redirect:admin-home";
+		}
+		if(u.getRole_id()==2) // 2 = User
+		{
+			return "redirect:all-politicians";
+		}
+		
+		
+		return "redirect:home";
+	}
+	@RequestMapping(value="login",method=RequestMethod.GET)
+	public String loginGet()
+	{
+		return "redirect:home";
+	}
+   @RequestMapping(value="logout" ,method={RequestMethod.POST,RequestMethod.GET})
+	String logout(ModelMap map,HttpSession session)
+	{
+		methodIn("logout");
+		session.invalidate();
+		windows.clearCache();
+		Runtime.getRuntime().freeMemory();
+		methodOut("logout");
+		return "redirect:home";
+
+	}
+	@RequestMapping(value="all-politicians",method=RequestMethod.GET)
+	public String allPoliticiansGet(HttpSession session,HttpServletRequest request,ModelMap map)
+	{
+		String letter="A";
+		int user_id=0;
+		UserSession u=new UserSession(session);
+		/*if(u.getRole_id()!=1 || u.getRole_id()!=2 || u.getUser_id()==0)
+		{
+			if(u.getRole_id()!=1)
+			{
+				return "redirect:home";
+			}	
+		}*/
+		if(u.getUser_id()>0)
+		{
+			user_id=u.getUser_id();
+		}
+		if(session.getAttribute("letter")!=null && !(session.getAttribute("letter")+"").equals(""))
+		{
+			letter=session.getAttribute("letter").toString();
+		}
+		if(request.getParameter("q")!=null)
+		{
+			letter=request.getParameter("q");
+			if(letter.equals(""))
+			{
+				letter="A";
+			}
+			session.setAttribute("letter", letter);
+		}
+		String q=letter+"%";
+		List<AdminModel> politician_info=getCommonServices().getAllPoliticians(q,user_id);
+		List<AdminModel> politician_follower_count=getCommonServices().getPoliticiansFollowersCount(q);
+		
+		map.addAttribute("politician_info",politician_info);
+		map.addAttribute("politician_follower_count",politician_follower_count);
+		map.addAttribute("latter",letter);
+		
+		return "Common/Politicians";
+	}
+	
+	@RequestMapping(value="show-profile",method=RequestMethod.GET)
+	public String ShowProfilePost(ModelMap map,HttpServletRequest request,HttpSession session)
+	{
+		UserSession u = new UserSession(session);
+		String tab="all_post";
+		int celebrity_id=0;
+		List<AdminModel> news_post=null;
+		List<AdminModel> suggested_politician=null;
+		List<CommonModel> getUserLikesCount=null;
+		List<CommonModel> getUserCommentsCount=null;
+		int activity_id=0;
+		/*if(session.getAttribute("activity_id")!=null)
+		{
+			activity_id=Integer.parseInt(session.getAttribute("activity_id").toString());
+		}*/
+		if(session.getAttribute("celebrity_profile_id")!=null)
+		{
+			celebrity_id=Integer.parseInt(session.getAttribute("celebrity_profile_id")+"");
+			List<AdminModel> all_posts=getCommonServices().getAllPostnews_ById(celebrity_id,u.getUser_id());
+			map.addAttribute("all-info", all_posts);
+		}
+		if(request.getParameter("tab")!=null)
+		{
+			tab=request.getParameter("tab")+"";
+		}
+		int user_id=0;
+		if(u.getUser_id()>0)
+		{
+			user_id=u.getUser_id();
+		}
+		List<AdminModel> celebrity_info=getCommonServices().getCelebrity_info(celebrity_id,user_id);
+		
+		suggested_politician=getCommonServices().getSuggested_politician(celebrity_id);
+		if(tab.equals("all_post")) 
+		{
+				news_post=getCommonServices().getAllPostnews_ById(celebrity_id,u.getUser_id());
+				
+					getUserLikesCount=getCommonServices().getAllNPLikesCount();
+					getUserCommentsCount=getCommonServices().getAllNPCommentsCount();
+				
+		}
+		else if(tab.equals("facebook"))
+		{ 
+			        activity_id=2;
+					news_post=getCommonServices().getFacebook_post(celebrity_id,u.getUser_id());
+					//session.setAttribute("liked_activity_id", "2");
+						getUserLikesCount=getCommonServices().getSpecificUserLikes(activity_id);
+						getUserCommentsCount=getCommonServices().getNewsPostCommentsCount(activity_id);
+						
+		}
+		else if(tab.equals("twitter"))
+		{	        activity_id=2;
+					news_post=getCommonServices().getTwitter(celebrity_id,u.getUser_id());
+					//session.setAttribute("liked_activity_id", "2");
+					getUserLikesCount=getCommonServices().getSpecificUserLikes(activity_id);
+					getUserCommentsCount=getCommonServices().getNewsPostCommentsCount(activity_id);
+		}
+		else if(tab.equals("instagram"))
+		{           activity_id=2;
+					news_post=getCommonServices().getInstagram_post(celebrity_id,u.getUser_id());
+					//session.setAttribute("liked_activity_id", "2");
+					getUserLikesCount=getCommonServices().getSpecificUserLikes(activity_id);
+					getUserCommentsCount=getCommonServices().getNewsPostCommentsCount(activity_id);
+		}
+		else if(tab.equals("news")){
+			activity_id=1;
+				news_post=getCommonServices().getAll_news(celebrity_id,u.getUser_id());
+				//session.setAttribute("liked_activity_id", "1");
+				getUserLikesCount=getCommonServices().getSpecificUserLikes(activity_id);
+				getUserCommentsCount=getCommonServices().getNewsPostCommentsCount(activity_id);
+		}
+		
+		List<CommonModel> politician_suggested_follower_count=getCommonServices().getCelebrityFollowersCount();
+		
+		map.addAttribute("politician_suggested_follower_count",politician_suggested_follower_count);
+
+		map.addAttribute("suggested_politician",suggested_politician);
+		map.addAttribute("celebrity_info", celebrity_info);
+		map.addAttribute("news_post", news_post);
+		map.addAttribute("active_tab", tab);
+		map.addAttribute("getUserLikesCount",getUserLikesCount);
+		map.addAttribute("getUserCommentsCount",getUserCommentsCount);
+		
+		if(map.get("news_id")!=null)
+		{
+			map.addAttribute("show_news",map.get("news_id"));
+		}
+		if(map.get("politician_news_id")!=null)
+		{
+			map.addAttribute("politician_news_id",map.get("politician_news_id"));
+			map.addAttribute("news_source_redirect",map.get("news_source"));
+		}
+		return "Common/PoliticianProfile";
+		
+	}
+	@RequestMapping(value="show-profile",method=RequestMethod.POST)
+	public String ShowProfileGet(RedirectAttributesModelMap map,HttpServletRequest request,HttpSession session)
+	{
+		map.addFlashAttribute("celebrity_id", request.getParameter("celebrity_id"));
+		session.setAttribute("celebrity_profile_id", request.getParameter("celebrity_id"));
+		
+		map.addFlashAttribute("news_id",request.getParameter("news_id"));
+		map.addFlashAttribute("politician_news_id",request.getParameter("politician_news_id"));
+		map.addFlashAttribute("politician_id",request.getParameter("politician_id"));
+		map.addFlashAttribute("news_source",request.getParameter("news_source"));
+		System.out.println("news source for redirect..."+request.getParameter("news_source"));
+		return "redirect:show-profile";
+	}
+	
+	@RequestMapping(value="follow-politician",method=RequestMethod.POST)
+	public String allPoliticiansPost(HttpServletRequest request,HttpSession session)
+	{
+		UserSession u=new UserSession(session);
+		int user_id=0;
+		if(u.getUser_id()>0)
+		{
+			user_id=u.getUser_id();
+		}
+		if(request.getParameter("celebrity_id")!=null)
+		{
+			int celebrity_id=Integer.parseInt(request.getParameter("celebrity_id"));
+			getCommonServices().addPoliticianFollowers(user_id, celebrity_id);
+		}
+		if(request.getParameter("redirectTo").equals("politician_profile"))
+		{
+			return "redirect:show-profile";
+		}
+		return "redirect:all-politicians";
+	}
+	
+	@RequestMapping(value="settings", method=RequestMethod.GET)
+	public String settingsGet(@Valid CommonModel c, HttpSession session, ModelMap map)
+	{
+		UserSession u=new UserSession(session);
+		/*if(u.getRole_id()!=1 || u.getRole_id()!=2)
+		{
+			if(u.getRole_id()!=1)
+			{
+				return"redirect:home";
+			}
+			if(u.getRole_id()!=2)
+			{
+				return"redirect:home";
+			}
+		}*/
+		List<CommonModel> getUserInformation=getCommonServices().getUserInformation(u.getUser_id());
+		List<CommonModel> getUserFollowerList=getCommonServices().getUserFollowerList(u.getUser_id());
+		
+		map.addAttribute("getUserFollowerList",getUserFollowerList);
+		map.addAttribute("getUserInformation",getUserInformation);
+		
+		if(map.get("error")!=null)
+		{
+			map.addAttribute("error",map.get("error"));
+		}
+		if(map.get("message")!=null)
+		{
+			map.addAttribute("message",map.get("message"));
+		}
+		if(map.get("activeTab")!=null)
+        {
+        	map.addAttribute("activeTab",map.get("activeTab"));
+        }
+		if(map.get("successTabActive")!=null)
+		{
+			map.addAttribute("successTabActive",map.get("successTabActive"));
+		}
+		return "Common/Settings";
+	}
+	
+	@RequestMapping(value="settings", method=RequestMethod.POST)
+	public String settingsPost(@Valid CommonModel c, HttpSession session, RedirectAttributesModelMap redirectAttributes,HttpServletRequest request)
+	{
+		UserSession u=new UserSession(session);
+		
+		if(request.getParameter("activeTab")!=null)
+        {
+        	redirectAttributes.addFlashAttribute("activeTab",request.getParameter("activeTab"));
+        }
+		String first_name=c.getFirst_name();
+		String last_name=c.getLast_name();
+		String contact_no=c.getContact_no();
+		String email_id=c.getEmail_id();
+		if(c.getFirst_name()!=null && request.getParameter("activeTab")==null)
+		{
+			List<CommonModel> getUserInformation=getCommonServices().getUserInformation(u.getUser_id());
+            for(CommonModel co:getUserInformation)
+            {
+            	if(co.getEmail_id().equals(email_id))
+            	{
+        			getCommonServices().updateUserInformation(u.getUser_id(), first_name, last_name, contact_no, email_id);
+            	    redirectAttributes.addFlashAttribute("message","Profile updated successfully.!!!");
+            	}
+            	else{
+            		List<CommonModel> getExistingEmail=getCommonServices().getExistingUser(email_id);
+        			if(!getExistingEmail.isEmpty())
+        			{
+        				redirectAttributes.addFlashAttribute("error","This email id is aulready present");
+        				redirectAttributes.addFlashAttribute("successTabActive",1);
+        				return"redirect:settings";
+        			}
+        			getCommonServices().updateUserInformation(u.getUser_id(), first_name, last_name, contact_no, email_id);
+                    getCommonServices().updateUserCredentials(u.getUser_id(), email_id);
+            	    redirectAttributes.addFlashAttribute("message","Profile updated successfully.!!!");
+            	}
+            }
+            redirectAttributes.addFlashAttribute("successTabActive",1);
+		}
+		return "redirect:settings";
+	}
+	
+	@RequestMapping(value="change-password",method=RequestMethod.POST)
+	public String changePasswordPost(@Valid CommonModel c, HttpSession session,RedirectAttributesModelMap redirectAttributes,HttpServletRequest request)
+	{
+		if(request.getParameter("activeTab")!=null)
+        {
+        	redirectAttributes.addFlashAttribute("activeTab",request.getParameter("activeTab"));
+        }
+		UserSession u=new UserSession(session);
+		
+		String old_password=null,new_password=null,confirm_password=null;
+
+		if(c.getOld_password()!=null && request.getParameter("activeTab")==null)
+		{
+			old_password=c.getOld_password();
+			new_password=c.getNew_password();
+			String password=getCommonServices().getPassword(u.getUser_id());
+			if(!old_password.equals(password))
+			{
+				redirectAttributes.addFlashAttribute("error","Invalid Old Password");
+				redirectAttributes.addFlashAttribute("successTabActive",2);
+				return "redirect:settings";
+			}
+			getCommonServices().updatePassword(u.getUser_id(), new_password);
+			redirectAttributes.addFlashAttribute("message","Password updated successfully.!!!");
+			redirectAttributes.addFlashAttribute("successTabActive",2);
+		}
+		return "redirect:settings";
+	}
+	
+	@RequestMapping(value="register",method=RequestMethod.POST)
+	public String registrationPost(@Valid CommonModel c,HttpSession session,RedirectAttributesModelMap redirectAttributes,HttpServletRequest request)
+	{
+		            int user_id=0;
+            		List<CommonModel> getExistingEmail=getCommonServices().getExistingUser(c.getEmail_id());
+        			if(!getExistingEmail.isEmpty())
+        			{
+        				redirectAttributes.addFlashAttribute("error","This email id is aulready present");
+        				return"redirect:home";
+        			}
+        			getCommonServices().addNewUser(c);
+        			List<CommonModel> getUserId=getCommonServices().getExistingUser(c.getEmail_id());
+        			for(CommonModel co:getUserId)
+        			{
+        				user_id=co.getUser_id();
+        				getCommonServices().addUserCredentials(user_id,c.getEmail_id(), c.getNew_password(), 2);
+                	    redirectAttributes.addFlashAttribute("message","Registered successfully.!!!");
+                	    
+        			}
+        			return "redirect:home";
+	}
+	
+	@RequestMapping(value="followers",method=RequestMethod.POST)
+	public String followersPost(HttpServletRequest request, RedirectAttributesModelMap redirectAttributes)
+	{
+		if(request.getParameter("activeTab")!=null)
+        {
+        	redirectAttributes.addFlashAttribute("activeTab",request.getParameter("activeTab"));
+        }
+		if(request.getParameter("activeTab")==null && request.getParameter("follow_id")!=null)
+		{
+			int follow_id=Integer.parseInt(request.getParameter("follow_id"));
+			getCommonServices().unfollowCelebrity(follow_id);
+			redirectAttributes.addFlashAttribute("message","Unfollowed successfully.!!!");
+		}
+		
+		return "redirect:settings";
+	}
+	
+	@RequestMapping(value="user-searches",method=RequestMethod.POST)
+	public String userSearches(@Valid CommonModel c, HttpSession session)
+	{
+		UserSession u=new UserSession(session);
+		int count=0;
+		List<CommonModel> getAllUserSearches=getCommonServices().getUserSearches(c.getSearch_key());
+		if(getAllUserSearches.isEmpty())
+		{
+			if(c.getSearch_key()!=null)
+	        {
+				count=count+1;
+	        	getCommonServices().addUserSearches(c.getSearch_key(), count);
+	        }	
+		}
+		else{
+			for(CommonModel com:getAllUserSearches)
+			{
+				count=com.getCount()+1;
+				getCommonServices().updateSearchCount(c.getSearch_key(), count);
+			}
+			
+		}
+        if(u.getRole_id()!=0)
+        {
+        	return "redirect:search-keys";
+        }
+        
+        
+		return"redirect:home";
+	}
+	
+	@RequestMapping(value="login-redirection",method=RequestMethod.POST)
+	@ResponseBody
+	public String loginFrom(HttpServletRequest request)
+	{
+		System.out.println("in function");
+		String result="ok";
+		System.out.println("here..."+request.getParameter("index_from"));
+		return result;
+	}
+	
+	@RequestMapping(value="user-likes-function",method=RequestMethod.POST)
+	@ResponseBody
+	public String userLikesFunction(HttpServletRequest request,HttpSession session)
+	{
+		String result="";
+		UserSession u=new UserSession(session);
+		
+		if(request.getParameter("news_id")!=null)
+		{
+			int activity_id=0;
+			int news_id=Integer.parseInt(request.getParameter("news_id"));
+			if(request.getParameter("news_source").equals("news"))
+			{
+				activity_id=1;
+			}
+			else{
+				activity_id=2;
+			}
+			System.out.println("news source..."+request.getParameter("news_source"));
+			session.setAttribute("liked_news_id", news_id);
+			session.setAttribute("liked_news_source",request.getParameter("news_source"));
+			session.setAttribute("activity_id", activity_id);
+			getCommonServices().addUserLikes(u.getUser_id(),news_id, activity_id);
+		    int count = getCommonServices().getUserLikeCount(news_id, activity_id);
+		    result=String.valueOf(count);
+		}
+		
+		return result;
+	}
+	@RequestMapping(value="user-comments-function",method=RequestMethod.POST)
+	@ResponseBody
+	public String userCommentsFunction(HttpServletRequest request,HttpSession session)
+	{
+		String result="ok";
+		UserSession u=new UserSession(session);
+		
+		System.out.println("news_id..."+request.getParameter("news_id"));
+		System.out.println("news_id..."+request.getParameter("news_id"));
+		if(request.getParameter("news_id")!=null && request.getParameter("news_id")!="")
+		{
+			int activity_id=0;
+			int news_id=Integer.parseInt(request.getParameter("news_id"));
+			if(request.getParameter("news_source").equals("news"))
+			{
+				activity_id=1;
+			}
+			else{
+				activity_id=2;
+			}
+		    int count = getCommonServices().getUserCommentsCount(news_id, activity_id);
+		    System.out.println("count..."+count);
+			String data="{\"comments\":[";
+			HashMap<String, String> comments_data=new HashMap<>();
+			List<CommonModel> getCommentsInfo=getCommonServices().getUserComments(news_id, activity_id);
+
+			int cnt=0;
+			for(CommonModel ap:getCommentsInfo)
+			{		
+				cnt++;
+				comments_data.put("\"user_id\"","\""+ ap.getUser_id()+"\"");
+				comments_data.put("\"user_name\"","\""+ ap.getFirst_name()+ap.getLast_name()+"\"");
+				comments_data.put("\"last_name\"", "\""+ap.getLast_name()+"\"");
+				comments_data.put("\"comment_id\"", "\""+ap.getComment_id()+"\"");
+				comments_data.put("\"comments\"", "\""+ap.getComment()+"\"");
+				comments_data.put("\"comments_count\"", "\""+count+"\"");
+				String str=comments_data+"";
+				str=str.replace("=", ":");
+				if(cnt<getCommentsInfo.size())
+					{
+						str=str+",";
+					}
+					data=data+str;
+			}
+				data=data+"]}";
+				result=data;
+		}
+		if(request.getParameter("comments")!=null && request.getParameter("comments")!="")
+		{
+			int activity_id=0;
+			int news_id=Integer.parseInt(request.getParameter("news_id"));
+			String comments=request.getParameter("comments");
+			if(request.getParameter("news_source").equals("news"))
+			{
+				activity_id=1;
+			}
+			else{
+				activity_id=2;
+			}
+			getCommonServices().addUserComments(u.getUser_id(), news_id, activity_id, comments);
+		    //int count = getCommonServices().getUserLikeCount(news_id, activity_id);
+		    //result=String.valueOf(count);
+		}
+		if(request.getParameter("comment_id")!=null && request.getParameter("comment_id")!="")
+		{
+			int comment_id=Integer.parseInt(request.getParameter("comment_id"));
+			getCommonServices().deleteUserComments(comment_id);
+		}
+		return result;
+	}
+	
+	@RequestMapping(value="delete-user-likes",method=RequestMethod.POST)
+	public String deleteUserLikes(HttpServletRequest request)
+	{
+		String result="ok";
+		if(request.getParameter("delete_like_id")!=null && request.getParameter("delete_like_id")!="")
+		{
+			int news_id=Integer.parseInt(request.getParameter("news_id"));
+			int activity_id=0;
+			if(request.getParameter("news_source").equals("news"))
+			{
+				activity_id=1;
+			}
+			else{
+				activity_id=2;
+			}
+			System.out.println("like id...."+request.getParameter("delete_like_id"));
+			int like_id=Integer.parseInt(request.getParameter("delete_like_id"));
+			getCommonServices().deleteUserLikes(like_id);
+			
+			int count = getCommonServices().getUserLikeCount(news_id, activity_id);
+		    result=String.valueOf(count);
+		}
+		return result;
+	}
+}

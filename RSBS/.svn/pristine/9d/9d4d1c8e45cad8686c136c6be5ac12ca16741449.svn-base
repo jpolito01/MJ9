@@ -1,0 +1,36 @@
+.bg-faded{
+	/* background-color: gray !important; */
+	background: -webkit-linear-gradient(0deg,#002868 , #00289f) !important;
+}
+.nav-link{
+	color : white !important;
+	font-family: Century schoolbook;
+}
+.nav-item{
+	/* border: 1px solid white; */
+}
+
+/* Side-nav Link */
+.flex-column
+{
+	    background: -webkit-linear-gradient(0deg,#03178e , #00004d)  !important;
+}
+.side-nav-item{
+		font-family: Century schoolbook;
+		padding:10px 5px;
+		border: 1px solid white;
+}
+.side-nav-link{
+	color: white  !important;
+	font-size: 20px;
+}
+
+.flex-column>.active{
+	
+	background: none;
+	background-color: white;
+	/* background: -webkit-linear-gradient(0deg,#03178e , #00104d)  !important; */
+}
+.flex-column>.active>a{
+	color:yellow;
+}

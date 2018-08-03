@@ -1,0 +1,25 @@
+package common.services;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import common.model.CommonModel;
+
+import admin.model.AdminModel;
+
+public interface CommonServices {
+	public List<AdminModel> validate_email(@Param("user_name") String user_name,@Param("password") String password);	
+	public List<AdminModel> getAllPoliticians(@Param("celebrity_name") String celebrity_name,@Param("user_id") int user_id);
+	public List<AdminModel> getPoliticiansFollowersCount(@Param("celebrity_name") String celebrity_name);
+	public int addPoliticianFollowers(@Param("user_id") int user_id,@Param("celebrity_id") int celebrity_id);
+    public List<CommonModel> getUserInformation(@Param("user_id") int user_id);
+    public List<CommonModel> getExistingUser(@Param("email_id") String email_id);
+    public int updateUserInformation(@Param("user_id") int user_id,@Param("first_name") String first_name, @Param("last_name") String last_name,@Param("contact_no") String contact_no,@Param("email_id") String email_id);
+    public int updateUserCredentials(@Param("user_id") int user_id,@Param("user_name") String email_id);
+    public String getPassword(@Param("user_id") int user_id);
+    public int updatePassword(@Param("user_id") int user_id,@Param("password") String password);
+    public int addNewUser(CommonModel model);
+    public int addUserCredentials(@Param("user_id") int user_id,@Param("user_name") String user_name,@Param("password") String password,@Param("role_id") int role_id);
+
+}

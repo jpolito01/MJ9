@@ -1,0 +1,516 @@
+package admin.controller;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+
+import org.hibernate.validator.util.GetConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.portlet.bind.annotation.RenderMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
+
+import common.controller.UserSession;
+import common.model.CommonModel;
+
+import admin.model.AdminModel;
+import admin.services.AdminServices;
+
+@Controller
+public class AdminController {
+
+	@Autowired
+	private AdminServices adminServices;
+
+	public AdminServices getAdminServices() {
+		return adminServices;
+	}
+
+	public void setAdminServices(AdminServices adminServices) {
+		this.adminServices = adminServices;
+	}
+//	ManagePoliticians
+	
+	@RequestMapping(value="admin-home",method=RequestMethod.GET)
+	public String AdminHomeGet(ModelMap map, HttpSession session)
+	{
+		UserSession u=new UserSession(session);
+		if(u.getRole_id()!=1)
+		{
+			return "redirect:home";
+		}
+		List<AdminModel> party_info=getAdminServices().getPartyInfo();
+		List<AdminModel> all_celebrity_info=getAdminServices().getAllCelebrity_info();
+		List<AdminModel> all_states=getAdminServices().getAllStates();
+		List<AdminModel> all_politician_category=getAdminServices().getAllCelebrityCategories();
+		
+		map.addAttribute("celebrity_info", all_celebrity_info);
+		map.addAttribute("party_info",party_info);
+		map.addAttribute("all_states",all_states);
+		map.addAttribute("all_politician_category",all_politician_category);
+		
+		return "Admin/ManagePoliticians";
+	}
+	@RequestMapping(value="manage-politician",method=RequestMethod.POST)
+	public String ManagePolitician(HttpServletRequest request,HttpSession session,@Valid AdminModel ad,RedirectAttributesModelMap map)
+	{
+		if(request.getParameter("ActDctCelebrityId")!=null && request.getParameter("flag")!=null) // Activate deactivate celebrity
+		{
+			if(!(request.getParameter("ActDctCelebrityId")+"").equals("") && !(request.getParameter("flag")+"").equals(""))
+			{
+					int celebrity_id=Integer.parseInt(request.getParameter("ActDctCelebrityId")+"");
+					int flag=Integer.parseInt(request.getParameter("flag")+"");
+					if(flag==1)
+					{
+						getAdminServices().ActivateCelebrity(celebrity_id);
+						map.addFlashAttribute("message", "Politician activated successfully.");
+					}
+					else if(flag==0)
+					{
+						getAdminServices().DeactivateCelebrity(celebrity_id);
+						map.addFlashAttribute("message", "Politician deactivated successfully.");
+					}
+			}
+			return "redirect:admin-home";
+		}
+		if(request.getParameter("delete_celebrity_id")!=null)
+		{
+			String id=request.getParameter("delete_celebrity_id");
+			if(id!="")
+			{
+				int celebrity_id=Integer.parseInt(id);
+				getAdminServices().deleteCelebrityNewsComments(celebrity_id);
+				getAdminServices().deleteCelebrityNewsLikes(celebrity_id);
+				getAdminServices().deleteCelebrityPostsComments(celebrity_id);
+				getAdminServices().deleteCelebrityPostsLikes(celebrity_id);
+				getAdminServices().deleteCelebrityFollowers(celebrity_id);
+				getAdminServices().deletePoliticianInfo(celebrity_id);
+				getAdminServices().deleteCelebrityCategory(celebrity_id);
+				map.addFlashAttribute("message", "Politician deleted successfully.");
+				return "redirect:admin-home";
+			}
+		}
+		
+		return "redirect:admin-home";
+	}
+	
+	
+	@RequestMapping(value="add-politician",method=RequestMethod.POST)
+	public String AdminHomePost(HttpServletRequest request,HttpSession session,@Valid AdminModel ad,@RequestParam("d_file") MultipartFile d_file) throws IllegalStateException, IOException
+	{
+		UserSession u=new UserSession(session);
+		if(u.getRole_id()!=1)
+		{
+			return "redirect:home";
+		}
+		if(session.getAttribute("edit_celebrity_id")!=null)
+		{
+			int celebrity_id=Integer.parseInt(session.getAttribute("edit_celebrity_id")+"");
+			ad.setCelebrity_id(celebrity_id);
+			getAdminServices().updateCelebrityInfo(ad);
+			
+			if(ad.getCategroy_name()!=null)
+			{
+				getAdminServices().deleteCelebrityCategory(celebrity_id);
+			String[] category_name=ad.getCategroy_name().split(",");
+			for(int i=0;i< category_name.length ; i++)
+			{
+				int category_id=Integer.parseInt(category_name[i].toString());
+				getAdminServices().addCelebrityCategory(celebrity_id,category_id);
+			}
+			}
+			if(!d_file.getOriginalFilename().equals(""))
+			{
+				if(!d_file.getInputStream().equals(null))
+					{
+						List<AdminModel> celeb_profile=getAdminServices().getCelebrityInfo_byId(celebrity_id);
+						for(AdminModel a:celeb_profile)
+						{
+							if(a.getProfile_photo_path()!=null)
+							{
+								if(!a.getProfile_photo_path().equals(""))
+								{
+									String file_path="C:\\PoliticianPhotoes\\"+a.getProfile_photo_path();
+									File f=new File(file_path);
+									boolean is_deleted=f.delete();
+								}
+							}
+						}
+					
+						Date d=new Date();
+						String file_name="C"+celebrity_id+"_"+d.getTime()+"."+d_file.getContentType().split("/")[1];
+						String filePath="C:\\PoliticianPhotoes\\ProfilePhoto\\"+file_name;
+						File uploadedFile=new File(filePath);
+							d_file.transferTo(uploadedFile);
+							ad.setCelebrity_id(celebrity_id);
+							ad.setProfile_photo_name(file_name);
+							ad.setProfile_photo_path("\\ProfilePhoto\\"+file_name);
+							getAdminServices().updateCelebrityProfile_photo(ad.getProfile_photo_name(), ad.getProfile_photo_path(),ad.getCelebrity_id());
+					}
+			}
+			session.removeAttribute("edit_celebrity_id");
+			return "redirect:admin-home";
+		}
+		
+		int celebrity_id=0;
+		ad.setIsActive(1);
+		
+		getAdminServices().addPoliticianInfo(ad);
+		List<AdminModel> celeb_info=getAdminServices().getLastAdded_celebrity();
+			for(AdminModel a:celeb_info)
+			{
+				if(a.getCelebrity_name().equals(ad.getCelebrity_name()))
+				{
+					celebrity_id=a.getCelebrity_id();
+				}
+			}
+			if(ad.getCategroy_name()!=null)
+			{
+			String[] category_name=ad.getCategroy_name().split(",");
+			for(int i=0;i< category_name.length ; i++)
+			{
+				int category_id=Integer.parseInt(category_name[i]);
+				getAdminServices().addCelebrityCategory(celebrity_id,category_id);
+			}
+			}
+			
+		if(!d_file.getOriginalFilename().equals(""))
+		{
+			if(!d_file.getInputStream().equals(null))
+				{
+					Date d=new Date();
+					String file_name="C"+celebrity_id+"_"+d.getTime()+"."+d_file.getContentType().split("/")[1];
+					String filePath="C:\\PoliticianPhotoes\\ProfilePhoto\\"+file_name;
+					File uploadedFile=new File(filePath);
+						d_file.transferTo(uploadedFile);
+						ad.setCelebrity_id(celebrity_id);
+						ad.setProfile_photo_name(file_name);
+						ad.setProfile_photo_path("\\ProfilePhoto\\"+file_name);
+						getAdminServices().updateCelebrityProfile_photo(ad.getProfile_photo_name(), ad.getProfile_photo_path(),ad.getCelebrity_id());
+				}
+		}
+		
+		if(ad.getSearch_key_id()!=0)
+		{
+			System.out.println("del id1...."+ad.getSearch_key_id());
+			List<AdminModel> getAllSearchKeys=getAdminServices().getAllSearchKeys();
+			for(AdminModel a:getAllSearchKeys)
+			{
+				if(a.getSearch_key().equals(ad.getCelebrity_name()))
+				{
+					System.out.println("del id2...."+ad.getSearch_key_id());
+
+					getAdminServices().deleteSearchKey(ad.getSearch_key_id());
+				}
+			}
+			return "redirect:search-keys";
+		}
+		return "redirect:admin-home";
+	}
+	@RequestMapping(value="set-attributes")
+	@ResponseBody
+	public String SetAttributes(HttpServletRequest request,HttpSession session)
+	{
+			String result="ok";
+			HashMap<String, String> celebrity_data=new HashMap<>();
+			String data="[";
+			HashMap<String, String> category_data=new HashMap<>();
+			int cnt=0;
+			if(request.getParameter("celebId_edit")!=null)
+			{
+					int celebrity_id=Integer.parseInt(request.getParameter("celebId_edit")+"");
+					session.setAttribute("edit_celebrity_id", request.getParameter("celebId_edit"));
+					List<AdminModel> celebrity_info=getAdminServices().getCelebrityInfo_byId(celebrity_id);
+					List<AdminModel> getCategoryData=getAdminServices().getCelebrityCategory(celebrity_id);
+					for(AdminModel ap:getCategoryData)
+					{
+						cnt++;
+						category_data.put("\"category_id\"", "\""+ap.getCategory_id()+"\"");
+						category_data.put("\"category_name\"", "\""+ap.getCategroy_name()+"\"");
+						String str=category_data+"";
+						str=str.replace("=", ":");
+						if(cnt<getCategoryData.size())
+						{
+							str=str+",";
+						}
+						data=data+str;
+					}
+					
+					data=data+"]";
+					System.out.println("Data : "+data);
+					for(AdminModel a:celebrity_info)
+					{
+								celebrity_data.put("\"celebrity_name\"","\""+ a.getCelebrity_name()+"\"");
+								celebrity_data.put("\"party_name\"","\""+ a.getParty_name()+"\"");
+								celebrity_data.put("\"facebook_page\"", "\""+a.getFacebook_page()+"\"");
+								celebrity_data.put("\"twitter_data\"", "\""+a.getTwitter_handle()+"\"");
+								celebrity_data.put("\"instagram_page\"", "\""+a.getInstagram_page()+"\"");
+								celebrity_data.put("\"party_id\"", "\""+a.getParty_id()+"\"");
+								celebrity_data.put("\"bio\"", "\""+a.getBio()+"\"");
+								celebrity_data.put("\"state\"", "\""+a.getState_name()+"\"");
+								celebrity_data.put("\"state_id\"", "\""+a.getState_id()+"\"");
+								celebrity_data.put("\"category_details\"", data);
+								
+								if(a.getProfile_photo_path()!=null)
+								{
+									String profile_photo=a.getProfile_photo_path();
+									profile_photo=profile_photo.replace("\\", "\\\\");
+									celebrity_data.put("\"profile_photo\"", "\""+profile_photo+"\"");	
+								}
+					}
+			}
+			result=celebrity_data+"";
+			result=result.replace("=", ":");
+			return result;
+	}
+	@RequestMapping(value="show-celebrity")
+	@ResponseBody
+	public String showCelebrity(HttpServletRequest request,HttpSession session)
+	{
+			String result="ok";
+			String data="[";
+			HashMap<String, String> category_data=new HashMap<>();
+			HashMap<String, String> celebrity_data=new HashMap<>();
+			int cnt=0;
+			if(request.getParameter("celebId_show")!=null)
+			{
+				int celebrity_id=Integer.parseInt(request.getParameter("celebId_show")+"");
+				List<AdminModel> celebrity_info=getAdminServices().getCelebrityInfo_byId(celebrity_id);
+				List<AdminModel> getCategoryData=getAdminServices().getCelebrityCategory(celebrity_id);
+				for(AdminModel ap:getCategoryData)
+				{
+					cnt++;
+					category_data.put("\"category_id\"", "\""+ap.getCategory_id()+"\"");
+					category_data.put("\"category_name\"", "\""+ap.getCategroy_name()+"\"");
+					String str=category_data+"";
+					str=str.replace("=", ":");
+					if(cnt<getCategoryData.size())
+					{
+						str=str+",";
+					}
+					data=data+str;
+				}
+				
+				data=data+"]";
+				
+				for(AdminModel a:celebrity_info)
+				{
+							celebrity_data.put("\"celebrity_name\"", "\""+a.getCelebrity_name()+"\"");
+							celebrity_data.put("\"party_name\"", "\""+a.getParty_name()+"\"");
+							celebrity_data.put("\"facebook_page\"", "\""+a.getFacebook_page()+"\"");
+							celebrity_data.put("\"twitter_data\"", "\""+a.getTwitter_handle()+"\"");
+							celebrity_data.put("\"instagram_page\"", "\""+a.getInstagram_page()+"\"");
+							celebrity_data.put("\"party_id\"", "\""+a.getParty_id()+"\"");
+							celebrity_data.put("\"bio\"", "\""+a.getBio()+"\"");
+							celebrity_data.put("\"state\"", "\""+a.getState_name()+"\"");
+							celebrity_data.put("\"category_details\"", data);
+							if(a.getProfile_photo_path()!=null)
+							{
+								String profile_photo=a.getProfile_photo_path();
+								profile_photo=profile_photo.replace("\\", "\\\\");
+								celebrity_data.put("\"profile_photo\"", "\""+profile_photo+"\"");
+							}
+							
+				}
+				
+			}
+			result=celebrity_data+"";
+			result=result.replace("=", ":");
+			
+			return result;
+	}
+	
+	@RequestMapping(value="blacklist-website",method=RequestMethod.POST)
+	public String blacklistWebsite_Post(@Valid AdminModel ad,RedirectAttributesModelMap map,HttpServletRequest request)
+	{
+		int flag=0;
+		if(request.getParameter("edit_web_id")!=null)
+		{
+			String id=""+request.getParameter("edit_web_id");
+			if(!id.equals(""))
+			{
+				String website_name=request.getParameter("website_name")+"";
+				try{
+					URL u=new URL(website_name);
+				}catch(Exception e){flag++;}
+				if(flag>0)
+				{
+					map.addFlashAttribute("error", "This website is not valid. Please chekc it.!!");
+					return "redirect:blacklist-website";
+				}
+				List<AdminModel> blacklist_website=getAdminServices().getBlacklist_WebsiteByName(website_name);
+				if(!blacklist_website.isEmpty())
+				{
+					map.addFlashAttribute("error", "This Website already present");
+					return "redirect:blacklist-website";
+				}
+				int web_id=Integer.parseInt(id);
+				getAdminServices().updateWebsite_name(website_name, web_id);
+				map.addFlashAttribute("message", "Updated Successfully...!!");
+				return "redirect:blacklist-website";
+			}
+			
+		}
+		
+		if(request.getParameter("delete_web_id")!=null)
+		{
+			String id=request.getParameter("delete_web_id")+"";
+			if(!id.equals(""))
+			{
+				int web_id=Integer.parseInt(id);
+				getAdminServices().deleteWebsite_FromBlackList(web_id);
+				map.addFlashAttribute("message", "Website removed from black list successfully.!!");
+				return "redirect:blacklist-website";
+			}
+		}
+		try{
+			URL u=new URL(ad.getWebsite_name());
+		}catch(Exception e){flag++;}
+		if(flag>0)
+		{
+			map.addFlashAttribute("error", "This website is not valid. Please check it.!!");
+			return "redirect:blacklist-website";
+		}
+		String website_name=ad.getWebsite_name();
+		List<AdminModel> blacklist_website=getAdminServices().getBlacklist_WebsiteByName(website_name);
+		if(!blacklist_website.isEmpty())
+		{
+			map.addFlashAttribute("error", "This Website already present");
+			return "redirect:blacklist-website";
+		}
+		getAdminServices().InsertBlcakList_Website(ad.getWebsite_name());
+		map.addFlashAttribute("message", "Added successfully..!");
+		return "redirect:blacklist-website";
+	}
+	
+	@RequestMapping(value="blacklist-website",method=RequestMethod.GET)
+	public String blacklistWebsite_Get(@Valid AdminModel ad,ModelMap map, HttpSession session)
+	{
+		UserSession u=new UserSession(session);
+		if(u.getRole_id()!=1)
+		{
+			return "redirect:home";
+		}
+		List<AdminModel> balcklist_website=getAdminServices().getBlacklist_Website();
+		map.addAttribute("blacklist_website", balcklist_website);
+		return "Admin/BlacklistWebsite";
+	}
+	@RequestMapping(value="manage-parties",method=RequestMethod.GET)
+	public String managePartyGet(ModelMap map,HttpSession session)
+	{
+		UserSession u=new UserSession(session);
+		if(u.getRole_id()!=1)
+		{
+			return "redirect:home";
+		}
+		List<AdminModel> getAllPartyInfo=getAdminServices().getAllParties();
+		map.addAttribute("getAllPartyInfo",getAllPartyInfo);
+
+		return "Admin/ManageParties";
+	}
+	
+	@RequestMapping(value="manage-parties",method=RequestMethod.POST)
+	public String managePartyPost(@Valid AdminModel ad, RedirectAttributesModelMap redirectAttributes,HttpServletRequest request)
+	{
+		if(request.getParameter("edit_party_id")!=null)
+		{
+			String party_id=request.getParameter("edit_party_id");
+			if(party_id!="")
+			{
+				String party_name=request.getParameter("party_name");
+				List<AdminModel> getPartyNames=getAdminServices().getExistingPartyName(party_name);
+				if(!getPartyNames.isEmpty())
+				{
+					redirectAttributes.addFlashAttribute("error","This party is aulready present");
+					return "redirect:manage-parties";
+				}
+				int id=Integer.parseInt(party_id);
+				getAdminServices().updatePartyName(id, party_name);
+				redirectAttributes.addFlashAttribute("message","Party Name Updated Successfully.!!");
+				return "redirect:manage-parties";
+			}
+		}
+		if(request.getParameter("delete_party_id")!=null)
+		{
+			String party_id=request.getParameter("delete_party_id");
+			if(party_id!="")
+			{
+				int id=Integer.parseInt(party_id);
+				getAdminServices().deleteParty(id);
+				redirectAttributes.addFlashAttribute("message","Party Deleted Successfully.!!");
+				return "redirect:manage-parties";
+			}
+		}
+		
+		if(ad.getParty_name()!=null)
+		{
+			String party_name=ad.getParty_name();
+			List<AdminModel> getPartyNames=getAdminServices().getExistingPartyName(party_name);
+			if(!getPartyNames.isEmpty())
+			{
+				redirectAttributes.addFlashAttribute("error","This party is aulready present");
+				return "redirect:manage-parties";
+			}
+			getAdminServices().addNewParty(party_name);
+			redirectAttributes.addFlashAttribute("message","Party Added Successfully.!!");
+		}
+		
+		return "redirect:manage-parties";
+	}
+	
+	@RequestMapping(value="search-keys",method=RequestMethod.GET)
+	public String addCelebrityGet(ModelMap map, HttpSession session)
+	{
+		UserSession u = new UserSession(session);
+		if(u.getRole_id()!=1)
+		{
+			return "redirect:home";
+		}
+		if(map.get("message")!=null)
+		{
+			map.addAttribute("message",map.get("message"));
+		}
+		List<AdminModel> getAllSearchKeys=getAdminServices().getAllSearchKeys();
+		List<AdminModel> party_info=getAdminServices().getPartyInfo();
+		
+		map.addAttribute("party_info",party_info);
+		map.addAttribute("getAllSearchKeys",getAllSearchKeys);
+		
+		
+		return "Admin/SearchKeys";
+	}
+	
+	@RequestMapping(value="search-keys",method=RequestMethod.POST)
+	public String addCelebrityPost(HttpServletRequest request,RedirectAttributesModelMap redirectAttributes)
+	{
+		if(request.getParameter("edit_search_key_id")!=null)
+		{
+			int id=Integer.parseInt(request.getParameter("edit_search_key_id"));
+			
+			getAdminServices().updateSearchKey(id,request.getParameter("search_key_name"));
+			redirectAttributes.addFlashAttribute("message","Search Key Updated Successfully.!!!");
+		}
+		if(request.getParameter("delete_search_key_id")!=null)
+		{
+			int id=Integer.parseInt(request.getParameter("delete_search_key_id"));
+	
+            getAdminServices().deleteSearchKey(id);
+			redirectAttributes.addFlashAttribute("message","Search Key Deleted Successfully.!!!");
+		}
+		return "redirect:search-keys";
+	}
+}

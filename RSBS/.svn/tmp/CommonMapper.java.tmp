@@ -1,0 +1,158 @@
+package common.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
+import com.google.gson.annotations.SerializedName;
+
+import common.model.CommonModel;
+
+import admin.model.AdminModel;
+
+public interface CommonMapper {
+	
+/*Added By Snigdha*/	  
+			public String GET_NEWS_COUNT="SELECT count(news_id) as news_count,c.celebrity_id FROM celebrity_news c "+
+												"  where substr(publication_date,1,10)=substr(now(),1,10) group by celebrity_id order by news_count";
+			@Select(GET_NEWS_COUNT)
+			public List<AdminModel> getNewsCount();
+	
+			public String GET_POST_COUNT="SELECT count(post_id) as post_count,s.celebrity_id FROM social_media_post s  "+
+										"	 where substr(created_time,1,10)=substr(now(),1,10) group by celebrity_id order by post_count" ;
+			@Select(GET_POST_COUNT)
+			public List<AdminModel> getPostCount();
+
+			public String GET_TOP_NEWS="SELECT * FROM celebrity_news c "+
+													" join celebrity_info ci on ci.celebrity_id = c.celebrity_id "+
+													" where substr(publication_date,1,10)=substr(now(),1,10) and c.celebrity_id=#{celebrity_id} " +
+													" order by publication_date desc limit 1";
+			@Select(GET_TOP_NEWS)
+			public List<AdminModel> getTop_news(@Param("celebrity_id") int celebrity_id);
+			
+			public String POPULAR_FOUR_NEWS="SELECT * FROM celebrity_news c "+
+															" join celebrity_info ci on ci.celebrity_id = c.celebrity_id "+
+															" where substr(publication_date,1,10)=substr(now(),1,10) and c.celebrity_id !=#{celebrity_id} "+
+															" order by publication_date limit 4 " ;
+			@Select(POPULAR_FOUR_NEWS)
+			public List<AdminModel> getPopularFour_news(@Param("celebrity_id") int celebrity_id);
+			
+			public String GET_ALL_POST_NEWS="SELECT ci.party_id,news_id, c.celebrity_id, news_source,  news_description_url, news_title, image_url, publication_date FROM celebrity_news c "+
+																" join celebrity_info ci on ci.celebrity_id=c.celebrity_id "+
+																" where substr(publication_date,1,10)=substr(now(),1,10) "+
+																" union "+
+																" SELECT ci.party_id, post_id, s.celebrity_id, post_source,  null as news_description_url,  message, image_url,  created_time FROM social_media_post s "+
+																"join celebrity_info ci on s.celebrity_id=ci.celebrity_id"+
+																" where substr(created_time,1,10)=substr(now(),1,10) "+
+																" order by publication_date desc" ;
+			@Select(GET_ALL_POST_NEWS)
+			public List<AdminModel> getAllPost_news();
+			
+			public String GET_ALL_POST_NEWS_BY_ID="SELECT ci.party_id,news_id, c.celebrity_id, news_source,  news_description_url, news_title, image_url, DATE_FORMAT(publication_date, '%d %b  %H:%i') publication_date FROM celebrity_news c "+
+					" join celebrity_info ci on ci.celebrity_id=c.celebrity_id "+
+					" where  c.celebrity_id=#{celebrity_id} " +
+					" union "+
+					" SELECT ci.party_id, post_id, s.celebrity_id, post_source,  null as news_description_url,  message, image_url,  DATE_FORMAT(created_time, '%d %b  %H:%i') as publication_date  FROM social_media_post s "+
+					"join celebrity_info ci on s.celebrity_id=ci.celebrity_id"+
+					" where  s.celebrity_id=#{celebrity_id}"+
+					" order by publication_date desc" ;
+			@Select(GET_ALL_POST_NEWS_BY_ID)
+			public List<AdminModel> getAllPostnews_ById(@Param("celebrity_id") int celebrity_id);
+			
+			public String GET_ALL_SOCIAL_MEDIA_POST ="SELECT ci.party_id,s.post_id as news_id, s.celebrity_id, s.post_source as news_source, null as news_description_url,s.message as news_title, image_url,DATE_FORMAT(created_time, '%d %b  %H:%i') as publication_date "+
+							" from social_media_post s "+
+							" join celebrity_info ci on ci.celebrity_id=s.celebrity_id "+
+							" where s.post_source=#{post_source}  and s.celebrity_id=#{celebrity_id}";
+			@Select(GET_ALL_SOCIAL_MEDIA_POST)
+			public List<AdminModel> getAll_SocialMediaPost(@Param("post_source") String post_source,@Param("celebrity_id") int celebrity_id);
+			
+			public String GET_ALL_NEWS="SELECT ci.party_id,c.news_id as news_id, c.celebrity_id, c.news_source, null as news_description_url, news_title, image_url,DATE_FORMAT(publication_date, '%d %b  %H:%i') as publication_date FROM celebrity_news c "+
+														"  join celebrity_info ci on ci.celebrity_id=c.celebrity_id  "+
+														" where c.celebrity_id=#{celebrity_id}";
+			@Select(GET_ALL_NEWS)
+			public List<AdminModel> getAll_news(@Param("celebrity_id") int celebrity_id);
+			
+			public String GET_CELEBRITY_INFO="SELECT c.* FROM celebrity_info c where celebrity_id=#{celebrity_id}";
+			@Select(GET_CELEBRITY_INFO)
+			public List<AdminModel> getCelebrity_info(@Param("celebrity_id") int celebrity_id);
+			
+			public String GET_SUGGESTED="SELECT * FROM celebrity_info c where celebrity_id!=#{celebrity_id} limit 10";
+			@Select(GET_SUGGESTED)
+			public List<AdminModel> getSuggested_politician(@Param("celebrity_id") int celebrity_id);
+/*Snigdha Kadam*/
+
+		public String VALIDATE_LOGIN="SELECT * FROM user_login u where user_name=#{user_name}  and password =#{password}";
+		@Select(VALIDATE_LOGIN)
+		public List<AdminModel> validate_email(@Param("user_name") String user_name,@Param("password") String password);
+		
+		public String ALL_POLITICIANS="select c.*,u.user_id as follower_id from celebrity_info c left join user_follower_map u on u.celebrity_id=c.celebrity_id and u.user_id=#{user_id} where celebrity_name like #{celebrity_name}";
+		@Select(ALL_POLITICIANS)
+		public List<AdminModel> getAllPoliticians(@Param("celebrity_name") String celebrity_name,@Param("user_id") int user_id);
+		
+		public String POLITITIAN_FOLLOWERS_COUNT="select count(c.celebrity_name) as follower_count,c.celebrity_id,u.user_id as follower_id from celebrity_info c left join user_follower_map u on u.celebrity_id=c.celebrity_id where celebrity_name like #{celebrity_name}";
+		@Select(POLITITIAN_FOLLOWERS_COUNT)
+		public List<AdminModel> getPoliticiansFollowersCount(@Param("celebrity_name") String celebrity_name);
+		
+		public String ADD_FOLLOWERS="insert into user_follower_map(user_id,celebrity_id) values(#{user_id},#{celebrity_id})";
+		@Insert(ADD_FOLLOWERS)
+		public int addPoliticianFollowers(@Param("user_id") int user_id,@Param("celebrity_id") int celebrity_id);
+
+		//10-11-2017 priti
+		public String GET_USER_INFORMATION="select * from anv_rsbs.user_information where user_id=#{user_id}";
+        @Select(GET_USER_INFORMATION)
+        public List<CommonModel> getUserInformation(@Param("user_id") int user_id);
+        
+        public String GET_EXISTING_USER="select user_id,email_id from anv_rsbs.user_information where email_id=#{email_id}";
+        @Select(GET_EXISTING_USER)
+        public List<CommonModel> getExistingUser(@Param("email_id") String email_id);
+        
+        public String UPDATE_USER_INFORMATION="update anv_rsbs.user_information set first_name=#{first_name}, last_name=#{last_name}, contact_no=#{contact_no}, email_id=#{email_id} where user_id=#{user_id}";
+        @Update(UPDATE_USER_INFORMATION)
+        public int updateUserInformation(@Param("user_id") int user_id,@Param("first_name") String first_name, @Param("last_name") String last_name,@Param("contact_no") String contact_no,@Param("email_id") String email_id);
+
+        public String UPDATE_USER_CREDENTIALS="update anv_rsbs.user_login set user_name=#{user_name} where user_id=#{user_id}";
+        @Update(UPDATE_USER_CREDENTIALS)
+        public int updateUserCredentials(@Param("user_id") int user_id,@Param("user_name") String user_name);
+        
+        public String GET_PASSWORD="select password from anv_rsbs.user_login where user_id=#{user_id}";
+        @Select(GET_PASSWORD)
+        public String getPassword(@Param("user_id") int user_id);
+        
+        public String UPDATE_PASSWORD="update anv_rsbs.user_login set password=#{password} where user_id=#{user_id}";
+        @Update(UPDATE_PASSWORD)
+        public int updatePassword(@Param("user_id") int user_id,@Param("password") String password);
+        
+        public String ADD_NEW_USER="insert into anv_rsbs.user_information(first_name, last_name, contact_no, email_id) values(#{first_name}, #{last_name}, #{contact_no}, #{email_id})";
+        @Insert(ADD_NEW_USER)
+        public int addNewUser(CommonModel model);
+        
+        public String ADD_USER_CREDENTIALS="insert into anv_rsbs.user_login(user_id,user_name, password, role_id) values(#{user_id},#{user_name}, #{password}, #{role_id})";
+        @Insert(ADD_USER_CREDENTIALS)
+        public int addUserCredentials(@Param("user_id") int user_id,@Param("user_name") String user_name,@Param("password") String password,@Param("role_id") int role_id);
+
+        public String FOLLOWER_CELEBRITY_LIST="SELECT m.*,c.celebrity_name from anv_rsbs.user_follower_map m left join anv_rsbs.celebrity_info c on c.celebrity_id=m.celebrity_id where m.user_id=#{user_id}";
+        @Select(FOLLOWER_CELEBRITY_LIST)
+        public List<CommonModel> getUserFollowerList(@Param("user_id") int user_id);
+        
+        public String UNFOLLOW_CELEBRITY="delete from anv_rsbs.user_follower_map where follow_id=#{follow_id}";
+        @Delete(UNFOLLOW_CELEBRITY)
+        public int unfollowCelebrity(@Param("follow_id") int follow_id);
+        
+        //user searches
+        public String ADD_USER_SEARCHES="insert into anv_rsbs.user_searches(search_key,count) values(#{search_key},#{count})";
+        @Insert(ADD_USER_SEARCHES)
+        public int addUserSearches(@Param("search_key") String search_key, @Param("count") int count);
+
+        public String GET_USER_SEARCHES="select * from anv_rsbs.user_searches where search_key=#{search_key}";
+        @Select(GET_USER_SEARCHES)
+        public List<CommonModel> getUserSearches(@Param("search_key") String search_key);
+        
+        public String UPDATE_SEARCH_COUNT="update anv_rsbs.user_searches set count=#{count} where search_key=#{search_key}";
+        @Update(UPDATE_SEARCH_COUNT)
+        public int updateSearchCount(@Param("search_key") String search_key,@Param("count") int count);
+        
+}

@@ -1,0 +1,429 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+ <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"  %>
+ <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+ 
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Dashboard</title>
+</head>
+<body>
+<%@ include file="/WEB-INF/jsp/insideHeader.jsp"%>
+<div class="container" style="width:100%">
+		<div class="col-sm-12">
+			<c:if test="${not empty message }">
+							<div class="alert alert-success alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <strong>Success!</strong> ${message}
+                            </div>
+					</c:if>
+					<c:if test="${not empty error}">
+							<div class="alert alert-danger alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            ${error}
+                            </div>
+					</c:if>
+		</div>
+				<div class="row">
+						<div class="col-sm-2">
+								<ul class="nav flex-column">
+										  <li id="manage-politicians" class="side-nav-item active">
+										    	<a class="side-nav-link" href="admin-home">Manage Politicians</a>
+										  </li>
+										  <li class="side-nav-item">
+										    	<a class="side-nav-link" href="#">General Setting </a>
+										  </li>
+										  <li class="side-nav-item">
+										   		 <a class="side-nav-link" href="manage-parties">Manage Parties</a>
+										  </li>
+										  <li class="side-nav-item">
+										   		 <a class="side-nav-link" href="blacklist-website">Black-List Websites</a>
+										  </li>
+										  <li class="side-nav-item">
+										   		 <a class="side-nav-link" href="search-keys">User Search</a>
+										  </li>
+								</ul>				  
+						</div>
+						<div class="col-sm-10">
+							<div class="col-sm-12">
+							<form method="post" id="show_celeb">
+									<div class="row">
+										<!-- <div class="row form-group"> -->
+											<div class="col-sm-12 form-group">
+													<input type="button" class="btn-flat" value="Add Politician"  data-toggle="modal" data-target="#AddCelebrityModal">
+											</div>
+											<!-- </div> -->
+											<div class="col-sm-12">
+												<div class="table-responsive">
+  														<table class="table table-bordered">
+															<thead>
+																	<tr>
+																			<td> Politician Name </td>
+																			<td> Party Name </td>
+																			<td> Category name </td>
+																			<td>Activate/Deactivate </td>
+																			<td> Action</td>
+																	</tr>
+															</thead>
+															<tbody>
+																<c:forEach items="${celebrity_info}" var="ci">
+																		<tr>
+																				<td>${ci.getCelebrity_name()} </td>
+																				<td>${ci.getParty_name()}</td>
+																				<td> </td>
+																				<td> 
+																						<c:if test="${ci.getIsActive()==1 }">
+																								<a href="#" onclick="ActivateDeactivate('${ci.getCelebrity_id()}',0)"> Deactivate </a>
+																						</c:if>
+																						<c:if test="${ci.getIsActive()==0 }">
+																								<a href="#" onclick="ActivateDeactivate('${ci.getCelebrity_id()}',1)"> Activate </a>
+																						</c:if>
+																				</td>
+																				<td> 	
+																				        <a href="#" onclick="ViewCelebrity('${ci.getCelebrity_id()}')"  data-toggle="modal" data-target="#ViewCelebrityModal" >View</a>
+																						<a href="#" onclick="EditCelebrity('${ci.getCelebrity_id()}')"  data-toggle="modal" data-target="#EditCelebrityModal" ><img src="resources/assets/images/edit.png" width="40px" height="40px"></a>
+																						<a href="#" onclick="deleteCelebrity('${ci.getCelebrity_id()}')" data-toggle="modal" data-target="#deleteCelebrityModal"><img src="resources/assets/images/delete.png" width="40px" height="40px"></a>
+																				
+																				</td>
+																		</tr>
+																</c:forEach>
+															</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</form>
+								</div>
+						</div>
+					</div>
+					
+					<div class="modal fade" id="AddCelebrityModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+						  <div class="modal-dialog modal-lg" role="document">
+						    <div class="modal-content">
+						      <div class="modal-header">
+						        <h5 class="modal-title" id="exampleModalLabel">Add Politician</h5>
+						        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						          <span aria-hidden="true">&times;</span>
+						        </button>
+						      </div>
+						      <form:form action="add-politician" method="post" enctype="multipart/form-data" >
+									      <div class="modal-body">
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label>Politician Name </label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<input type="text" id="celebrity_name" name="celebrity_name" class="form-control">
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label> Party</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<select   class="form-control" name="party_id" id="party_id" class="form-control">
+									        							<option value="0">Select Party </option>
+									        							<c:forEach var="p" items="${party_info}">
+									        										<option value="${p.getParty_id()}"> ${p.getParty_name()}  </option>
+									        							</c:forEach>
+									        						
+									        					</select>
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label> State</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<select   class="form-control" name="state_id" id="state_id" class="form-control">
+									        							<option value="0">Select State </option>
+									        							<c:forEach var="s" items="${all_states}">
+									        										<option value="${s.getState_id()}"> ${s.getState_name()}  </option>
+									        							</c:forEach>
+									        						
+									        					</select>
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label>Politician Category</label>
+									        			</div>
+									        			<div class="col-sm-7">
+								        							<c:forEach var="c" items="${all_politician_category}">
+                                                                      <input type="checkbox" name="categroy_name"
+														value="${c.getCategory_id()}"> ${c.getCategroy_name()} <br>
+									        						</c:forEach>
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label> Facebook page</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<input type="text" name="facebook_page" id="facebook_page" class="form-control">
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label> twitter_handle </label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<input type="text" name="twitter_handle" id="twitter_handle" class="form-control">
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label> instagram_page</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<input id="instagram_page" name="instagram_page" class="form-control">
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label> Upload profile photo</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<input type="file" id="d_file" name="d_file">
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        	<div class="col-sm-5">
+									        	<label> Bio </label>
+									        	</div>
+									        	<div class="col-sm-7">
+									        	<textarea rows="4" name="bio" id="bio" class="form-control"></textarea>
+									        	</div>
+									        	</div>
+									      </div>
+										      <div class="modal-footer">
+												      <button type="submit" class="btn btn-primary">Save</button>
+												       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+										      </div>
+							      </form:form>
+						    </div>
+						  </div>
+						</div>
+					
+					<div class="modal fade" id="deleteCelebrityModal">
+						<div class="modal-dialog modal-lg">
+							<div class="modal-content">
+								<div class="modal-header">
+									Are you sure you want to delete this celebrity?
+								</div>
+								<div class="modal-body">
+									<div class="row">
+									<div class="col-md-12" align="right">
+									<div class="save-btn">
+										<input type="button" class="btn-flat" value="Yes" onclick="deleteCelebrity('')">
+										<input type="button" class="btn-flat" value="No" data-dismiss="modal">
+									</div>
+									</div>
+									</div>
+								</div>
+							</div>
+						</div>
+		</div>
+		
+					<div class="modal fade" id="EditCelebrityModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+						  <div class="modal-dialog modal-lg" role="document">
+						    <div class="modal-content">
+						      <div class="modal-header">
+						        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+						        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						          <span aria-hidden="true">&times;</span>
+						        </button>
+						      </div>
+						      <form:form action="add-politician" method="post" enctype="multipart/form-data" >
+									      <div class="modal-body">
+									      		<div class="row form-group">
+									      				<div class="col-sm-4">
+									      						<img id="profile_pic" width="100%">
+									      				</div>
+									      		</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label>Politician Name </label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<input type="text" id="celebrity_name_e" name="celebrity_name" class="form-control">
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label> party name</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<select   class="form-control" name="party_id" id="party_id_e" class="form-control">
+									        							<option value="0">Select Party </option>
+									        							<c:forEach var="p" items="${party_info}">
+									        										<option value="${p.getParty_id()}"> ${p.getParty_name()}  </option>
+									        							</c:forEach>
+									        						
+									        					</select>
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label> State</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<select   class="form-control" name="state_id" id="state_id_e" class="form-control">
+									        							<option value="0">Select State </option>
+									        							<c:forEach var="s" items="${all_states}">
+									        										<option value="${s.getState_id()}"> ${s.getState_name()}  </option>
+									        							</c:forEach>
+									        						
+									        					</select>
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label>Politician Category</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        			<c:forEach var="c" items="${all_politician_category}">
+									        								<input type="checkbox" name="categroy_name" id="${c.getCategory_id()}" value="${c.getCategory_id()}">${c.getCategroy_name()}
+									        						</c:forEach>
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label> Facebook page</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<input type="text" name="facebook_page" id="facebook_page_e" class="form-control">
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label> twitter_handle </label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<input type="text" name="twitter_handle" id="twitter_handle_e" class="form-control">
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label> instagram_page</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<input id="instagram_page_e" name="instagram_page" class="form-control">
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        			<div class="col-sm-5">
+									        					<label> Upload profile photo</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<input type="file" id="d_file" name="d_file">
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        	<div class="col-sm-5">
+									        	<label> Bio </label>
+									        	</div>
+									        	<div class="col-sm-7">
+									        	<textarea rows="4" name="bio" id="bio_e" class="form-control"></textarea>
+									        	</div>
+									        	</div>
+									      </div>
+										      <div class="modal-footer">
+												      <button type="submit" class="btn btn-primary">Update</button>
+												       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+										      </div>
+							      </form:form>
+						    </div>
+						  </div>
+						</div>	
+					
+					<div class="modal fade" id="ViewCelebrityModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+						  <div class="modal-dialog modal-lg" role="document">
+						    <div class="modal-content">
+						      <div class="modal-header">
+						        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+						        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						          <span aria-hidden="true">&times;</span>
+						        </button>
+						      </div>
+									      <div class="modal-body">
+									      		<div class="row">
+									      				<div class="col-sm-4">
+									      						<img id="profile_pic_v" width="100%">
+									      				</div>
+									      		</div>
+									        	<div class="row">
+									        			<div class="col-sm-5">
+									        					<label>Politician Name </label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<label id="celebrity_name_v" name="celebrity_name"></label>
+									        			</div>
+									        	</div>
+									        	<div class="row">
+									        			<div class="col-sm-5">
+									        					<label> party name</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<label name="party_name" id="party_name_v"></label>
+									        			</div>
+									        	</div>
+									        	<div class="row">
+									        			<div class="col-sm-5">
+									        					<label> State</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<label name="state_name" id="state_name_v"></label>
+									        			</div>
+									        	</div>
+									        	<div class="row">
+									        	<div class="col-md-5"><label id="category"></label></div>
+									        	<div class="col-md-7" id="pol_category"></div>
+									        	</div>
+									        	<div class="row">
+									        			<div class="col-sm-5">
+									        					<label> Facebook page</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<label name="facebook_page" id="facebook_page_v"></label>
+									        			</div>
+									        	</div>
+									        	<div class="row">
+									        			<div class="col-sm-5">
+									        					<label> twitter_handle </label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<label name="twitter_handle" id="twitter_handle_v"></label>
+									        			</div>
+									        	</div>
+									        	<div class="row">
+									        			<div class="col-sm-5">
+									        					<label> instagram_page</label>
+									        			</div>
+									        			<div class="col-sm-7">
+									        					<label id="instagram_page_v" name="instagram_page"></label>
+									        			</div>
+									        	</div>
+									        	<div class="row form-group">
+									        	<div class="col-sm-5">
+									        	<label> Bio </label>
+									        	</div>
+									        	<div class="col-sm-7">
+									        	<label name="bio" id="bio_v"></label>
+									        	</div>
+									        	</div>
+									      </div>
+						    </div>
+						  </div>
+						</div>
+					
+					
+					
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="resources/assets/js/admin.js"></script>
+</body>
+</html>

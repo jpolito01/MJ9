@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<html lang="en">
+<head>
+  <title>Home</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- <link rel="stylesheet" href="resources/assets/css/Acotrs.css"> -->
+</head>
+
+<body>
+<%@ include file="/WEB-INF/jsp/insideHeader.jsp"%>
+<%-- <c:choose>
+<c:when test="${empty user_id}">
+<%@ include file="/WEB-INF/jsp/header.jsp"%>
+</c:when>
+<c:otherwise>
+
+</c:otherwise>
+</c:choose> --%>
+	<div class="container main-container">
+		<div class="col-sm-12 padding-one">
+		<div class="panel panel-default">
+		<div class="panel-body">
+			<div class="col-sm-12">
+				<label class="title">Politicians</label>
+			</div>
+			<div class="col-sm-12">
+				<c:forEach var="i" begin="65" end="90">
+				    <a style="text-decoration: none;" class="padding-one" href="all-politicians?q=<%=Character.toChars((Integer)pageContext.getAttribute("i"))%>">
+				    	<span id="<%=Character.toChars((Integer)pageContext.getAttribute("i"))%>" class="span_letters"><%=Character.toChars((Integer)pageContext.getAttribute("i"))%></span> 
+				    </a>
+				</c:forEach>
+			</div>
+			</div>
+			</div>
+		</div>
+		
+		<div class="col-sm-12">
+			<c:forEach var="ci" items="${politician_info}">
+				<div class="col-sm-4">
+					<div class="row profile-card">
+						<div class="col-sm-5 celeb_ing">
+							<a href="#" onclick="showProfile('${ci.getCelebrity_id()}')"> 
+								<img src="image${ci.getProfile_photo_path()}" width="100%">
+							</a>
+						</div>
+						<div class="col-sm-7">
+							<div class="col-sm-12 profile-content">
+								<div class="col-sm-12 padding-one">
+									<a class="politician_name" href="#" onclick="showProfile('${ci.getCelebrity_id()}')"> ${ci.getCelebrity_name()} </a>
+								</div>
+								<div class="col-sm-12 padding-one">
+									<c:set var="follower_cnt" value="0"></c:set>
+									<c:forEach var="f" items="${politician_follower_count}">
+										<c:if test="${f.getCelebrity_id()==ci.getCelebrity_id()}">
+											<c:set var="follower_cnt" value="${f.getFollower_count()}"></c:set>
+										</c:if>
+									</c:forEach>
+									<span class="span-follower">${follower_cnt} followers</span>
+								</div>
+								<div class="col-sm-12 padding-one">
+									<c:if test="${ci.getFollower_id()==user_id}">
+										<img src="resources/assets/images/done.png" height="30px" width="100px">
+									</c:if>
+									<c:if test="${ci.getFollower_id()!=user_id}">
+										<input class="btn-follow" type="button" value="+ Follow" onclick="followCelebrity('${ci.getCelebrity_id()}','1')">
+									</c:if>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</c:forEach>
+			
+		</div>
+	</div>
+	
+	<div class="modal fade" id="AllPolititiansLoginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="login" method="post">
+			      <div class="modal-body">
+			        	<div class="row">
+			        		<div class="col-sm-12">
+			        			<div class="col-sm-5">
+			        					<label> User Name :</label>
+			        			</div>
+			        			<div class="col-sm-7">
+			        					<input type="text" id="user_name" name="user_name" class="form-control">
+			        			</div>
+			        		</div>
+			        		<div class="col-sm-12">
+			        			<div class="col-sm-5">
+			        					<label> Password :</label>
+			        			</div>
+			        			<div class="col-sm-7">
+			        					<input type="text" id="password" name="password" class="form-control">
+			        			</div>
+			        		</div>
+			        	</div>
+			      </div>
+				      <div class="modal-footer">
+						      <button type="submit" class="btn-flat" onclick="loginValidation('all_politicians')">Login....</button>
+						       <button type="button" class="btn-flat" data-dismiss="modal">Close</button>
+						       <div class="row">
+						       <div class="col-md-12">
+						       <a href="#" data-toggle="modal" data-target="#AllPoliticianRegisterModal">Register</a>
+						       </div>
+						       </div>
+				      </div>
+	      </form>
+    </div>
+  </div>
+</div>	
+
+<div class="modal fade" id="AllPoliticianRegisterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Register</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <form action="register" method="post" id="register">
+      <div class="row">
+      <div class="col-md-12">
+      <div id="errName" style="color:red"></div>
+      </div>
+      </div>
+      <div class="row form-group">
+					<div class="col-md-6">
+					<span>First Name</span>
+					<input type="text" id="first_name" name="first_name" class="form-control">
+					</div>
+					<div class="col-md-6">
+					<span>Last Name</span>
+					<input type="text" id="last_name" name="last_name" class="form-control">
+					</div>
+					</div>
+					<div class="row form-group">
+					<div class="col-md-12">
+					<span>Contact Number</span>
+					<input type="text" id="contact_no" name="contact_no" class="form-control">
+					</div>
+					</div>
+					<div class="row form-group">
+					<div class="col-md-12">
+					<span>Email Id</span>
+					<input type="text" id="email_id" name="email_id" class="form-control">
+					</div>
+					</div>
+					<div class="row form-group">
+					<div class="col-md-12">
+					<span>Password</span>
+					<input type="text" id="new_password" name="new_password" class="form-control">
+					</div>
+					</div>
+					<div class="row form-group">
+					<div class="col-md-12">
+					<span>Confirm Password</span>
+					<input type="text" id="confirm_password" name="confirm_password" class="form-control">
+					</div>
+					</div>
+					<div class="row form-group">
+					<div class="col-md-12" align="center">
+					<input type="submit" value="Register" class="btn-flat" onclick="return validateRegistration('all_politicians')">
+					<button type="button" class="btn-flat" data-dismiss="modal">Close</button>
+					</div>
+					</div>
+					</form>
+      </div>
+      </div>
+      </div>
+</div>
+
+<script src="resources/assets/js/common.js"></script>
+	<!-- <iframe src="//www.facebook.com/plugins/likebox.php?
+href=http%3A%2F%2Fww.facebook.com%2FAngelina.Jolie&amp;width=490&amp;colorscheme=light&amp;show_faces=true&amp;height=435" scrolling="yes" frameborder="0" style="border:none; overflow:hidden; width=490px; height=300px; background:white; float:left;" allowTransparency="true"></iframe>
+	 -->
+<script>
+$(document).ready(function(){
+	$("#politicians").addClass("active");
+	$("#"+'${latter}').addClass("active-letter");
+});
+function followCelebrity(entity_id,entity_type_id)
+{
+	 if('${user_id}'=="")
+	 { 
+	 	$("#AllPolititiansLoginModal").modal('show');
+	 	return false;
+	 }
+else
+	 {
+		var tab_id="politicians";
+		fun_FinalFollow(entity_id,entity_type_id,tab_id);
+	 } 
+}
+function fun_FinalFollow(celebrity_id,entity_type_id,tab_id)
+{
+	document.forms[0].action="follow-politician?celebrity_id="+celebrity_id;
+	document.forms[0].method="post";
+	document.forms[0].submit();
+}
+</script>
+</body>
+</html>

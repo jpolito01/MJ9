@@ -1,0 +1,15 @@
+package common.services;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import admin.model.AdminModel;
+
+public interface CommonServices {
+	public List<AdminModel> validate_email(@Param("user_name") String user_name,@Param("password") String password);	
+	public List<AdminModel> getAllPoliticians(@Param("celebrity_name") String celebrity_name,@Param("user_id") int user_id);
+	public List<AdminModel> getPoliticiansFollowersCount(@Param("celebrity_name") String celebrity_name);
+	public int addPoliticianFollowers(@Param("user_id") int user_id,@Param("celebrity_id") int celebrity_id);
+
+}

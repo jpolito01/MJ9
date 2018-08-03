@@ -1,0 +1,109 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+ <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"  %>
+ 
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body style="background-color: #f2f2f2;">
+<%@ include file="/WEB-INF/jsp/header.jsp"%>
+<div class="container main-container">
+		<div class="col-sm-12">
+			<c:if test="${not empty error}">
+					<div class="alert alert-danger">
+							${error}
+					</div>
+			</c:if>
+		</div>
+		<div class="col-sm-12">
+			<div class="col-sm-12 first-part">
+					<div class="row">
+						<div class="col-sm-5 first-part-img">
+							<img src="resources/assets/images/2.jpg" width="100%">
+						</div>
+						<div class="col-sm-5">
+							<span class="first-part-text"> fbhdbfdb dfjdbfd bjff jddsfkjd sjfdjfdjjbfjdbsf jfhd fjghfj fjg fjfdghfjh jfjfgjgf </span>
+						</div>
+					</div>
+				</div>
+		</div>
+		<div class="col-sm-12 news-part">
+				<div class="row">
+				<c:forEach begin="4" end="7" var="s">
+					<div class="col-sm-3 news-card">
+							<div class="news-img">
+								<img src="resources/assets/images/${s}.jpg" width="100%">
+							</div>
+							<div class="contents">
+								${s}---bhcdb cbdh bchd chdbchdcbhdcb hdbch dfd fd fdf df df df df d f
+							</div>
+					</div>
+				</c:forEach>
+				</div>
+		</div>
+		<div class="row more-stories">
+			<div class="col-sm-8">
+				<div class="col-sm-12">
+						<div class="col-sm-12  title-bar">	<label> More Stories</label> </div>
+				</div>
+				<div class="col-sm-12 stories-details">
+						<div class="row">
+								<c:forEach var="s" begin="1" end="4">
+									<div class="col-sm-6">
+										<div class="col-sm-12 stories">
+											<div class="row">
+														<div class="col-sm-7 ">
+																<img src="resources/assets/images/${s}.jpg" width="100%">
+														</div>
+														<div class="col-sm-5">
+																		bhb h h hh bhhqwertyuio	 ertyuio	 asdfghj sdfghjk dfgh 
+																	<button type="button" class="red1">Read more</button>
+														</div>
+												</div>
+											</div>
+									</div>
+								</c:forEach>
+						</div>
+				</div>
+				<div class="col-sm-12">
+						<div class="col-sm-12  title-bar">	<label> Most Popular</label> </div>
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="row">
+								<c:forEach var="s" begin="1" end="5" varStatus="i">
+										<div class="col-sm-6">
+											<div class="col-sm-12 popular-people">
+												<div class="row">
+														<div class="col-sm-5">
+																<img src="resources/assets/images/${s}.jpg" width="100%">
+														</div>
+														<div class="col-sm-7 people-des">
+														 			name of politician....dcc c dcd c vf vf 
+														</div>
+												</div>
+											</div>
+										</div>
+								</c:forEach>
+								</div>
+								</div>
+						</div>
+				</div>
+			</div>
+			
+			<div class="col-sm-4">
+				<div class="col-sm-12 title-bar">
+						<label>Polytician Of the day</label>
+				</div>
+			</div>
+		</div>
+</div>
+
+<!-- //Century Schoolbook -->
+
+	
+</body>
+</html>

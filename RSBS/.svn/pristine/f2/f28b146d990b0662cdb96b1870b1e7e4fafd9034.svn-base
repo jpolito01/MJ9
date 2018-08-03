@@ -1,0 +1,80 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+ <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"  %>
+ <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Insert title here</title>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+ <link rel="stylesheet" href="resources/assets/css/bootstrap.min.css">
+ <link rel="stylesheet" href="resources/assets/css/bootstrap-grid.min.css">
+ <link rel="stylesheet" href="resources/assets/css/bootstrap-reboot.min.css">
+ <link rel="stylesheet" href="resources/assets/css/common.css"> 
+  <link rel="stylesheet" href="resources/assets/css/nav-style.css"> 
+   <link rel="stylesheet" href="resources/assets/css/all-pages.css"> 
+   <link href="https://fonts.googleapis.com/css?family=Oswald:400,500|Roboto:300,400,400i,500" rel="stylesheet">
+</head>
+<body background="resources/assets/images/inside-header.jpg" class="header-image">
+<%
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Cache-Control", "no-store");
+		response.setHeader("Pragma", "no-cache");
+		response.setDateHeader("Expires", 0);
+		if (session.getAttribute("user_name") == null) {
+			response.sendRedirect("home");
+		}
+	%>
+	<c:choose>
+	<c:when test="${not empty user_id}">
+	<div class="row">
+	<div class="col-md-10"></div>
+		<div class="col-md-2">
+		<div class="dropdown margin2">
+		<a href="#" data-toggle="dropdown"> <img src="resources/assets/images/user-settings.png" height="60px" width="60px"> </a>
+			<ul class="dropdown-menu">
+				<li><a href="settings" class="link-style">Setting</a></li>
+				<li><a href="logout" class="link-style">logout</a></li>
+				</ul>
+				</div>
+		</div>
+		</div>
+	</c:when>
+	<c:otherwise>
+	<div class="margin1"></div>
+	</c:otherwise>
+	</c:choose>
+<div class="container main-container">
+		
+		<nav class="navbar navbar-toggleable-md navbar-light bg-faded navbarStyle">
+					  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+					    <span class="navbar-toggler-icon"></span>
+					  </button>
+		  				<!-- <a class="navbar-brand" href="#">Navbar</a> -->
+						<div class="collapse navbar-collapse" id="navbarSupportedContent">
+						    <ul class="navbar-nav mr-auto">
+						    	<li class="nav-item middle-border">
+							        		<a class="nav-link" href="home">Home</a>
+							      </li>
+						    <c:if test="${role_id==1}">
+						   		<li class="nav-item middle-border">
+							        		<a class="nav-link" href="admin-home">Dashboard</a>
+							      </li>
+							      </c:if>
+							      <li class="nav-item middle-border" id="politicians">
+							        		<a class="nav-link" href="all-politicians">Politicians <span class="sr-only">(current)</span></a>
+							      </li>
+						    </ul>
+							    <form class="form-inline my-2 my-lg-0" action="user-searches" method="post">
+								      <input class="form-control mr-sm-2" type="text" placeholder="Search" name="search_key">
+								      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+							    </form>
+						  </div>
+		</nav>
+</div>
+<script src="resources/assets/js/common.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
+</body>
+</html>

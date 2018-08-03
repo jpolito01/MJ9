@@ -1,0 +1,56 @@
+package common.services;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import common.model.CommonModel;
+
+import admin.model.AdminModel;
+
+public interface CommonServices {
+/*Added By Snigdha 10/11/2017*/
+	public List<AdminModel> getPostCount();
+	public List<AdminModel> getNewsCount();
+	public List<AdminModel> getTop_news(@Param("celebrity_id") int celebrity_id);
+	public List<AdminModel> getPopularFour_news(@Param("celebrity_id") int celebrity_id);
+	public List<AdminModel> getAllPost_news();
+	public List<AdminModel> getAllPostnews_ById(@Param("celebrity_id") int celebrity_id,@Param("user_id") int user_id);
+	public List<AdminModel> getFacebook_post(int celebrity_id,@Param("user_id") int user_id);
+	public List<AdminModel> getInstagram_post( int celebrity_id,@Param("user_id") int user_id);
+	public List<AdminModel> getTwitter(int celebrity_id,@Param("user_id") int user_id);
+	public List<AdminModel> getAll_news( int celebrity_id,@Param("user_id") int user_id);
+	public List<AdminModel> getCelebrity_info(int celebrity_id,int user_id);
+	public List<AdminModel> getSuggested_politician(int celebrity_id);
+/*-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+	public List<AdminModel> validate_email(@Param("user_name") String user_name,@Param("password") String password);	
+	public List<AdminModel> getAllPoliticians(@Param("celebrity_name") String celebrity_name,@Param("user_id") int user_id);
+	public List<AdminModel> getPoliticiansFollowersCount(@Param("celebrity_name") String celebrity_name);
+	public int addPoliticianFollowers(@Param("user_id") int user_id,@Param("celebrity_id") int celebrity_id);
+    public List<CommonModel> getUserInformation(@Param("user_id") int user_id);
+    public List<CommonModel> getExistingUser(@Param("email_id") String email_id);
+    public int updateUserInformation(@Param("user_id") int user_id,@Param("first_name") String first_name, @Param("last_name") String last_name,@Param("contact_no") String contact_no,@Param("email_id") String email_id);
+    public int updateUserCredentials(@Param("user_id") int user_id,@Param("user_name") String email_id);
+    public String getPassword(@Param("user_id") int user_id);
+    public int updatePassword(@Param("user_id") int user_id,@Param("password") String password);
+    public int addNewUser(CommonModel model);
+    public int addUserCredentials(@Param("user_id") int user_id,@Param("user_name") String user_name,@Param("password") String password,@Param("role_id") int role_id);
+
+    public List<CommonModel> getUserFollowerList(@Param("user_id") int user_id);
+    public int unfollowCelebrity(@Param("follow_id") int follow_id);
+    public int addUserSearches(@Param("search_key") String search_key, @Param("count") int count);
+    public List<CommonModel> getUserSearches(@Param("search_key") String search_key);
+    public int updateSearchCount(@Param("search_key") String search_key,@Param("count") int count);
+    public int addUserLikes(@Param("user_id") int user_id,@Param("post_id_or_news_id") int post_id_or_news_id,@Param("activity_id") int activity_id);
+    public int addUserComments(@Param("user_id") int user_id,@Param("post_id_or_news_id") int post_id_or_news_id,@Param("activity_id") int activity_id,@Param("comment") String comment);
+    public int getUserLikeCount(@Param("post_id_or_news_id") int post_id_or_news_id,@Param("activity_id") int activity_id);
+    public List<CommonModel> getSpecificUserLikes(@Param("activity_id") int activity_id);
+    public List<CommonModel> getUserComments(@Param("post_id_or_news_id") int post_id_or_news_id,@Param("activity_id") int activity_id);
+    public int deleteUserComments(@Param("comment_id") int comment_id);
+    public int getUserCommentsCount(@Param("post_id_or_news_id") int post_id_or_news_id,@Param("activity_id") int activity_id);
+    public List<CommonModel> getNewsPostCommentsCount(@Param("activity_id") int activity_id);
+    public List<CommonModel> getAllNPLikesCount();
+    public List<CommonModel> getAllNPCommentsCount();
+    public int deleteUserLikes(@Param("like_id") int like_id);
+    public List<CommonModel> getCelebrityFollowersCount();
+}

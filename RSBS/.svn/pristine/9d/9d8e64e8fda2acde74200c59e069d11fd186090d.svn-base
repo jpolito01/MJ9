@@ -1,0 +1,31 @@
+package admin.services;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import admin.model.AdminModel;
+
+public interface AdminServices {
+	public List<AdminModel> getPartyInfo();
+	public void addPoliticianInfo(AdminModel ad);
+	public List<AdminModel> getLastAdded_celebrity();
+	public void updateCelebrityProfile_photo(String profile_photo_name,String profile_photo_path,int celebrity_id);
+	public List<AdminModel> getAllCelebrity_info();
+	public void ActivateCelebrity(int celebrity_id);
+	public void DeactivateCelebrity(int celebrity_id);
+	public List<AdminModel> getCelebrityInfo_byId( int celebrity_id);
+	public void updateCelebrityInfo(AdminModel ad);
+	
+	public List<AdminModel> getBlacklist_WebsiteByName(@Param("website_name") String website_name);
+	public int updateWebsite_name(@Param("website_name") String website_name,@Param("web_id") int web_id);
+	public int deleteWebsite_FromBlackList(@Param("web_id") int web_id);
+	public List<AdminModel> getBlacklist_Website();
+	public int InsertBlcakList_Website(@Param("website_name") String website_name);
+	public List<AdminModel> getExistingPartyName(@Param("party_name") String party_name);
+	public int addNewParty(@Param("party_name") String party_name);
+	public List<AdminModel> getAllParties();
+	public int updatePartyName(@Param("party_id") int party_id,@Param("party_name") String party_name);
+	public int deleteParty(@Param("party_id") int party_id);
+
+}
