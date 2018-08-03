@@ -1,0 +1,344 @@
+/* @font-face {
+    font-family: OpenSans-Regular;
+    src: url(fonts/OpenSans-Regular.ttf);
+} */
+
+body{
+	overflow-x:hidden; 
+
+}
+/* #navgrad{
+	font-family: OpenSans-Regular;
+	background: #00004d; For browsers that do not support gradients        
+    background: -webkit-linear-gradient(-90deg, #00004d, #03178d); For Safari 5.1 to 6.0
+    background: -o-linear-gradient(-90deg, #00004d, #03178d); For Opera 11.1 to 12.0
+    background: -moz-linear-gradient(-90deg, #00004d, #03178d); For Firefox 3.6 to 15
+    background: linear-gradient(-90deg, #00004d, #03178d); Standard syntax (must be last)
+} */
+/*Added by snigdha  */
+.slider-img{
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+}
+#myCarousel
+{
+	box-shadow:2px 3px 19px 0px #cccccc;
+	background-color: #ffffff;
+	background-image: none;
+	padding-bottom: 15px;
+}
+.make-white
+{
+	/* background-color: #ffffff !important; */
+	background-image: none !important;
+}
+/* End  */
+.nav-link{
+	color: #fff;
+}
+.logo{
+	width: 140px;
+}
+.celeb-profile{
+	margin: 35px 15px 20px 80px;
+	padding: 3px;
+	border:1px solid #6c6c6c;
+}
+.suggested-celeb{
+	margin: 35px 80px 20px 0;
+	height: 40px;
+	/*padding: 3px;
+	border:1px solid #6c6c6c;*/
+}
+.img-celeb{
+	width: 100%;
+	margin-left: -15px;
+}
+.celeb-name{
+	margin-left: -25px;
+	margin-top: 15px;
+	font-weight: 600;
+	margin-bottom: 0;
+	font-size: 24px;
+}
+.celeb-desig{
+	font-size: 16px;
+	margin-top: -15px;
+	margin-left: -25px;
+}
+.follower-count{
+	font-size: 12px;
+	margin-left: -25px;
+	margin-top: 15px;
+	font-weight: 600;
+}
+.box-footer{
+	padding: 10px !important;
+	background-color:white;
+	border: 1px solid #cccccc; /* Changed by Snigdha */
+}
+.description-header{
+	margin: 30px 0 0 10px;
+	font-weight: 500;
+	font-size: 22px;
+	font-family: Roboto Condensed;
+	color: black;
+}
+.slider-text{
+	/* margin: 10px 15px 10px 15px; */
+	
+}
+.slider-text>a:hover{
+	text-decoration: none;
+	color: #03178e !important;
+}
+.slider-text>a{
+	padding-top:10px;
+	font-weight: normal;
+    font-family: Roboto Condensed;
+    font-size: 29px;
+    color: #1a1a1a !important;
+    line-height: 40px;
+}
+ .box-footer>a
+  {
+  	font-family: Roboto Condensed !important;
+    font-size: 20px;
+    color: #1a1a1a !important;
+    font-weight: normal;
+    line-height: normal;
+  }
+  .box-footer>a:hover{
+  text-decoration: none;
+  color: #03178e !important;
+  }
+@media only screen and (max-width: 600px) {
+	.slider-text>a{
+		font-weight : bold;
+		font-family: Roboto Condensed; /*  Open sans; Playfair display */
+		font-size: 30px;
+		color: #1a1a1a !important;
+	}
+	.box-footer>a
+	  {
+	  	font-family: Roboto Condensed !important;
+	  	font-size: 28px !important;
+	  	color:	#1a1a1a !important;
+	  	font-weight: bold;
+	    text-decoration: none;
+	  }
+	
+}
+@media only screen and (max-width: 414px) {
+	.slider-text>a{
+		font-weight : bold;
+		font-family: Roboto Condensed; /*  Open sans; Playfair display */
+		font-size: 17px;
+		color: #1a1a1a !important;
+	}
+	.box-footer>a
+	  {
+	  	font-family: Roboto Condensed !important;
+	  	font-size: 17px !important;
+	  	color:	#1a1a1a !important;
+	  	font-weight: bold;
+	    text-decoration: none;
+	  }
+	.description-style{
+	font-size:13px !important;
+	}
+}
+
+
+.description-text{
+	font-size: 13px;
+	margin: 0 0 15px 10px;
+	font-family: Roboto Condensed;
+}
+.description-block{
+	margin: 6px 0px;
+}
+.box{
+	box-shadow:2px 3px 19px 0px #cccccc;
+	/* margin-right: 80px;
+	margin-left: 15px; */
+	margin-top:5px;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+}
+.outer-box{
+	/*box-shadow:2px 3px 19px 0px #888888;*/
+	margin-right: 15px;
+	margin-left: 80px;
+}
+.follow{
+	background-color: #000049;
+	color: #fff;
+	font-size: 12px;
+	border-radius: 12px;
+	border: none;
+	margin-top: 10px;
+    padding: 3px 15px;
+}
+.inner-box{
+	box-shadow:1px 1px 15px 0px #e2e2e2;
+}
+#movieBlogsHeading,#blogDetailsMainDivs .movieBlogsHeading{
+	margin-top:30px;
+	margin-bottom:15px;
+}
+
+#allBlogsMainDivs{
+	padding: 1% 8%;
+}
+
+#blogDetailsMainDivs{
+	padding: 1%;
+}
+
+.allBlogs-featured-inner-box{
+border: 1px solid #cccccc;
+}
+
+#featuredBlogRight{
+	    padding: 3% 5% 0 3%;
+}
+.featuredBlogTitle{
+	color:#333;
+	font-weight: 700;
+	font-size:38px;
+	font-family: Roboto Condensed;
+}
+#featuredBlogRight .movieBlogDescr{
+	font-size:20px;
+	    padding-right: 4%;
+	    padding-top:10px;
+}
+.allBlogs-inner-box .newstitle{
+	font-size:18px;
+	font-weight:700;
+}
+.allBlogs-inner-box .box-footer{
+	padding:15px !important;
+}
+.allBlogs-inner-box .movieBlogDescr{
+	padding-top:6px;
+	font-size:16px;
+}
+.readMoreAllBlogs{
+	color:#03178e;
+}
+
+.blogDetailstitle{
+	font-family: Roboto Condensed;
+	font-size:28px;
+	font-weight:700;
+}
+#blogDetailsBox{
+	padding:30px;
+}
+#blogDetailsBox .movieBlogDescr{
+	margin:30px 0;
+	font-size:16px;
+}
+@media only screen and (max-width: 800px) {
+	#featuredBlogRight{
+	    padding: 3% 10% 0 10%;
+}
+#allBlogsMainDivs,#blogDetailsMainDivs{
+	padding:10px;
+}
+}
+.celebrity_name_may
+{
+	font-family: Roboto Condensed;
+	font-size: 20px;
+	font-weight: normal;
+	
+}
+.news-title{
+	font-family: Open sans;
+	font-size: 23px;
+}
+.description-style{
+	font-size: 17px;
+	line-height: 130% !important;
+	padding-top: 50px !important;
+	text-decoration: none;
+	color:black;
+}
+.description-style:hover{
+	text-decoration: none;
+	color:black;
+}
+.blog_description_text{
+	font-size: 17px !important;
+}
+.category-text{
+	font-size: 17px;
+    margin: 0 10px;
+}
+.btn-follow-margin{
+	margin-right:5px;
+}
+/* .box-footer{
+	border: 1px solid #cccccc;
+}
+.description-header{
+	margin: 10px 0 0 10px;
+	font-weight: 600;
+	font-size: 19px;
+}
+.description-text{
+	font-size: 13px;
+	margin: 0 0 15px 10px;
+}
+.description-block{
+	margin: 13px 5px;
+}
+.box{
+	box-shadow:2px 3px 19px 0px #888888;
+	margin: 10px 0;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+	margin-right: 80px;
+	margin-left: 15px;
+}
+.outer-box{
+	box-shadow:2px 3px 19px 0px #888888;
+	margin-right: 15px;
+	margin-left: 80px;
+}
+.follow{
+	background-color: #000049;
+	color: #fff;
+	font-size: 12px;
+	border-radius: 12px;
+	border: none;
+	margin-top: 10px;
+    padding: 3px 15px;
+}
+.inner-box{
+	box-shadow:2px 3px 19px 0px #888888;
+}
+.newstitle
+{
+	padding: 7px;
+	font-family: Open sans;
+	font-size: 17px;
+	
+	text-decoration: none;
+    outline: none;
+     overflow: hidden;
+    color: #000;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-height: 20px;     fallback
+    max-height: 50px;      fallback
+    -webkit-line-clamp: 2; number of lines to show
+    -webkit-box-orient: vertical;
+} */
+.newstitle
+{
+	word-break:break-word;
+}
