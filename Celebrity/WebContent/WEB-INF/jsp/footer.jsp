@@ -28,10 +28,10 @@
 				</div>
 			</div> -->
 			 <div class="col-md-8 footerCopyrightDiv"> 
-       <span class="footerCopyrightText">© 2018 Now ya no</span>
-       <a href="resources/assets/pdfs/NYN_privacy_policy_for_website.pdf" class="privacyPolicyDiv"><span class="footerCopyrightText">Privacy Policy</span></a>
-       <a href="resources/assets/pdfs/NYN_Terms_of_Use.pdf" class="privacyPolicyDiv" target="_blank"><span class="footerCopyrightText">Terms of Use</span></a>
-       <a href="resources/assets/pdfs/DMCA_Copyright_Infringment_NYN.pdf" class="privacyPolicyDiv" target="_blank">DMCA</a>
+       <span class="footerCopyrightText">ï¿½ 2018 Now ya no</span>
+       <a href="resources/assets/pdfs/FollowingFame -privacy_policy_for_website" class="privacyPolicyDiv"><span class="footerCopyrightText">Privacy Policy</span></a>
+       <a href="resources/assets/pdfs/Following Fame_Terms of Use" class="privacyPolicyDiv" target="_blank"><span class="footerCopyrightText">Terms of Use</span></a>
+       <a href="resources/assets/pdfs/Following Fame_dmca_notice_language" class="privacyPolicyDiv" target="_blank">DMCA</a>
        </div>
 			<div class="col-sm-4 padding-one">
 				<div class="col-sm-12">
